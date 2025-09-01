@@ -43,6 +43,6 @@ This project is a web-based user interface for managing Minecraft servers. It al
     java -jar build/libs/mc-server-ui-0.0.1-SNAPSHOT.jar
     ```
 
-The application will be available at `http://localhost:8080`.
+The application will be available at `http://localhost:3443`.
 
 ## Project Structure
