@@ -23,7 +23,6 @@ This project is a web-based user interface for managing Minecraft servers. It al
 
 -   Java 17 or later
 -   Gradle 7.x or later
--   A Minecraft server JAR file (e.g., Paper, Spigot)
 
 ### Installation
 
