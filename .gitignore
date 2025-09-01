@@ -38,3 +38,4 @@ out/
 .claude/**
 .idea/**
 servers/**
+gradle/**
