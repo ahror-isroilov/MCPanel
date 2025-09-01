@@ -1,12 +1,3 @@
-/*
- * =================================================================
- * MINECRAFT PANEL - UNIFIED SYSTEM STYLES
- * =================================================================
- * This stylesheet aligns the system page with the core
- * design system for a consistent look and feel.
- * =================================================================
- */
-
 :root {
     --bg-main: hsl(0, 0%, 4%);
     --bg-card: hsl(0, 0%, 8%);
@@ -28,13 +19,13 @@
 
 body {
     font-family: 'Manrope', sans-serif;
-    background: var(--bg-main);
-    color: var(--text-primary);
+    background: #121212 radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%) fixed;
+    background-size: 100% 100%;
     min-height: 100vh;
+    color: var(--text-primary);
     line-height: 1.5;
 }
 
-/* Reusing Navbar styles for consistency */
 .navbar {
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-color);

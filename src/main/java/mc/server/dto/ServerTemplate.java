@@ -11,5 +11,6 @@ public record ServerTemplate(
     String hardwareRequirements,
     String imageUrl,
     String downloadUrl,
-    String type
+    String type,
+    List<InstallationStep> installationSteps
 ) {}

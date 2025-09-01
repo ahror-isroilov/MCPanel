@@ -3,6 +3,7 @@ package mc.server.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mc.server.dto.ServerTemplate;
@@ -19,9 +20,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TemplateService {
-
     private final ObjectMapper objectMapper;
     private final ResourceLoader resourceLoader;
+    @Getter
     private List<ServerTemplate> templates;
 
     @PostConstruct
@@ -38,7 +39,4 @@ public class TemplateService {
         }
     }
 
-    public List<ServerTemplate> getTemplates() {
-        return templates;
-    }
 }

@@ -28,12 +28,9 @@
     100% { transform: rotate(360deg); }
 }
 
-/* General Styles */
 body {
     font-family: 'Inter', sans-serif;
-    background: #121212;
-    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%);
-    background-attachment: fixed;
+    background: #121212 radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%) fixed;
     background-size: 100% 100%;
     color: var(--text-primary);
     min-height: 100vh;
@@ -47,7 +44,6 @@ body {
     margin: 0 auto;
 }
 
-/* Console Header */
 .console-header {
     display: flex;
     justify-content: space-between;
@@ -125,7 +121,6 @@ body {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-/* Compact button variant */
 .action-btn.compact {
     padding: 6px 12px;
     font-size: 12px;
@@ -241,8 +236,7 @@ body {
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.6;
-    background: #0a0a0a;
-    background-image: none;
+    background: #0a0a0a none;
 }
 
 .console-input-container {

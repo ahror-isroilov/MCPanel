@@ -90,7 +90,6 @@ minecraft:
       retention-days: 7
       compress-backups: true
 
-    # Monitoring configuration
     monitoring:
       enabled: true
       update-interval: 30s
@@ -100,11 +99,9 @@ minecraft:
       health-check-interval: 60  # seconds
       cpu-samples: 5
 
-  # Security configuration
   security:
     session-timeout: 5m
 
-  # Alert configuration
   alerts:
     enabled: true
     tps-threshold: 18.0
@@ -115,7 +112,6 @@ minecraft:
     notify-on-player-leave: false
     notify-on-server-restart: true
 
-# WebSocket configuration
 websocket:
   allowed-origins: "*"
   buffer-size: 8192

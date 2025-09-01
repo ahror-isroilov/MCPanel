@@ -36,7 +36,7 @@ public class ServerDownloaderService {
                 .thenApply(body -> {
                     try {
                         JsonNode builds = objectMapper.readTree(body).get("builds");
-                        if (builds.isArray() && builds.size() > 0) {
+                        if (builds.isArray() && !builds.isEmpty()) {
                             return builds.get(builds.size() - 1).get("build").asText();
                         }
                     } catch (IOException e) {

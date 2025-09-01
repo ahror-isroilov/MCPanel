@@ -1,60 +1,55 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Panel - Create Server</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <th:block th:insert="~{fragments/common :: common-head}"></th:block>
     <link th:href="@{/css/servers.css}" rel="stylesheet">
     <link th:href="@{/css/create-server.css}" rel="stylesheet">
 </head>
 <body>
 
-<div th:replace="~{fragments/common :: main-navbar(breadcrumbs=${breadcrumbs})}"></div>
+<div class="page-transition-wrapper">
+    <div th:replace="~{fragments/common :: main-navbar(breadcrumbs=${breadcrumbs})}"></div>
 
-<div class="main-container">
-    <div class="page-header">
-        <div class="header-content">
-            <h1 class="page-title">Forge Your World</h1>
-            <div class="header-description">
-                <p class="subtitle">Your journey starts with a single click.</p>
-                <p class="description">We've handcrafted these server blueprints for peak performance and stability, so you can focus on building your world, not configuring files.</p>
+    <div class="main-container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="page-title">Forge Your World</h1>
+                <div class="header-description">
+                    <p class="subtitle">Your journey starts with a single click.</p>
+                    <p class="description">We've handcrafted these server blueprints for peak performance and stability, so you can focus on building your world, not configuring files.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Paper">Paper</button>
+            <button class="filter-btn" data-filter="Forge">Forge</button>
+            <button class="filter-btn" data-filter="Fabric">Fabric</button>
+            <button class="filter-btn" data-filter="Vanilla">Vanilla</button>
+        </div>
 
-    <div class="filter-bar">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="Paper">Paper</button>
-        <button class="filter-btn" data-filter="Forge">Forge</button>
-        <button class="filter-btn" data-filter="Fabric">Fabric</button>
-        <button class="filter-btn" data-filter="Vanilla">Vanilla</button>
-    </div>
-
-    <div class="template-grid">
-        <!-- Template Card -->
-        <div class="template-card" th:each="template : ${templates}" th:data-template-id="${template.id}" th:data-template-name="${template.name}" th:data-type="${template.type}">
-            <img th:src="@{${template.imageUrl}}" alt="Template Image" class="card-image-top">
-            <div class="card-body">
-                <h2 class="card-title" th:text="${template.name}"></h2>
-                <div class="tags-container">
-                    <span class="tag" th:each="tag : ${template.tags}" th:text="${tag}"></span>
+        <div class="template-grid">
+            <!-- Template Card -->
+            <div class="template-card" th:each="template : ${templates}" th:data-template-id="${template.id}" th:data-template-name="${template.name}" th:data-type="${template.type}">
+                <img th:src="@{${template.imageUrl}}" alt="Template Image" class="card-image-top">
+                <div class="card-body">
+                    <h2 class="card-title" th:text="${template.name}"></h2>
+                    <div class="tags-container">
+                        <span class="tag" th:each="tag : ${template.tags}" th:text="${tag}"></span>
+                    </div>
+                    <p class="card-description" th:text="${template.description}"></p>
+                    <div class="requirements">
+                        <p><strong>System:</strong> <span th:text="${template.systemRequirements}"></span></p>
+                        <p><strong>Hardware:</strong> <span th:text="${template.hardwareRequirements}"></span></p>
+                    </div>
+                    <button class="install-button">
+                        <i class="fas fa-download"></i> Install
+                    </button>
                 </div>
-                <p class="card-description" th:text="${template.description}"></p>
-                <div class="requirements">
-                    <p><strong>System:</strong> <span th:text="${template.systemRequirements}"></span></p>
-                    <p><strong>Hardware:</strong> <span th:text="${template.hardwareRequirements}"></span></p>
-                </div>
-                <button class="install-button">
-                    <i class="fas fa-download"></i> Install
-                </button>
             </div>
         </div>
     </div>
@@ -77,5 +72,8 @@
 </div>
 
 <script th:src="@{/js/create-server.js}"></script>
+<th:block th:insert="~{fragments/common :: common-scripts}"></th:block>
+
 </body>
+</html>
 </html>

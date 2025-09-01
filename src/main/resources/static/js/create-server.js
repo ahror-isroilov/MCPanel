@@ -1,4 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Dynamic Header Title
+    const titles = [
+        "Forge Your World",
+        "Craft Your Realm",
+        "Build Your Universe",
+        "Start a New Adventure",
+        "Create Your Legacy"
+    ];
+    let currentTitleIndex = 0;
+    const pageTitle = document.querySelector('.page-title');
+
+    if (pageTitle) {
+        setInterval(() => {
+            currentTitleIndex = (currentTitleIndex + 1) % titles.length;
+            
+            pageTitle.classList.add('fade-out');
+            
+            setTimeout(() => {
+                pageTitle.textContent = titles[currentTitleIndex];
+                pageTitle.classList.remove('fade-out');
+            }, 500); // Corresponds to the CSS transition duration
+
+        }, 4000); // Change title every 4 seconds
+    }
+
     const modal = document.getElementById('install-modal');
     const closeButton = document.querySelector('.close-button');
     const installForm = document.getElementById('install-form');

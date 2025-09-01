@@ -15,11 +15,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 public class ServerInstance {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String instancePath;
     private String jarFileName;
@@ -30,4 +28,5 @@ public class ServerInstance {
     private int rconPort;
     private String rconPassword;
     private boolean rconEnabled;
+    private Integer pid;
 }

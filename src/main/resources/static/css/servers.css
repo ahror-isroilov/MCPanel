@@ -22,9 +22,7 @@
 
 body {
     font-family: 'Manrope', sans-serif;
-    background: #121212;
-    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%);
-    background-attachment: fixed;
+    background: #121212 radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%) fixed;
     background-size: 100% 100%;
     min-height: 100vh;
     color: var(--text-primary);
@@ -107,7 +105,6 @@ body {
     font-size: 15px;
 }
 
-/* Server Navigation Switcher */
 .server-nav-switcher {
     display: flex;
     background: var(--bg-main);
@@ -224,7 +221,6 @@ body {
     min-width: 0;
 }
 
-/* Top row with status, name, and actions */
 .header-top {
     display: flex;
     align-items: center;
@@ -277,7 +273,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Tags row aligned to the left below */
 .server-tags {
     display: flex;
     gap: 6px;
@@ -472,7 +467,6 @@ body {
     margin: 0;
 }
 
-/* Modal Styles */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -627,7 +621,6 @@ body {
     background: hsl(210, 80%, 55%);
 }
 
-/* Notification Styles */
 .notification-container {
     position: fixed;
     top: 20px;
@@ -706,7 +699,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Loading state for buttons */
 .start-btn.loading,
 .stop-btn.loading,
 .action-btn.loading {
@@ -714,13 +706,70 @@ body {
     pointer-events: none;
 }
 
-.start-btn.loading .fas,
-.stop-btn.loading .fas,
-.action-btn.loading .fas {
-    animation: spin 1s linear infinite;
+/* Empty State Styles */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    background-color: var(--bg-card);
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    margin-top: 24px;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.empty-state-icon {
+    font-size: 48px;
+    color: var(--accent);
+    margin-bottom: 24px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-main);
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+}
+
+.empty-state-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.empty-state-description {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin-bottom: 24px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    border: 1px solid hsl(210, 80%, 50%);
+}
+
+.btn-primary:hover {
+    background: hsl(210, 80%, 55%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
 }

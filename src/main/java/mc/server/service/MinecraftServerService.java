@@ -431,6 +431,8 @@ public class MinecraftServerService {
                 ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", instance.getJarFileName(), "nogui");
                 processBuilder.directory(Paths.get(instance.getInstancePath()).toFile());
                 Process process = processBuilder.start();
+                instance.setPid((int) process.pid());
+                serverInstanceRepository.save(instance);
 
                 serverStartTimes.put(instanceId, LocalDateTime.now());
                 onlinePlayers.put(instanceId, ConcurrentHashMap.newKeySet());
@@ -447,16 +449,28 @@ public class MinecraftServerService {
     @Async
     public CompletableFuture<Boolean> stopServer(Long instanceId) {
         log.info("Stopping Minecraft server instance {}...", instanceId);
+        ServerInstance instance = getInstance(instanceId);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 if (rconService.isConfigured(instanceId)) {
                     String response = rconService.executeCommandSync(instanceId, "stop");
                     if (response != null) {
                         log.info("Sent graceful stop command via RCON to instance {}", instanceId);
-                        Thread.sleep(5000); // Wait for graceful shutdown
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
                     }
                 }
 
+                if (isServerRunning(instanceId)) {
+                    log.warn("Server instance {} is still running, terminating process...", instanceId);
+                    ProcessHandle.of(instance.getPid()).ifPresent(ProcessHandle::destroy);
+                }
+
+                instance.setPid(null);
+                serverInstanceRepository.save(instance);
                 onlinePlayers.remove(instanceId);
                 currentPlayerCounts.remove(instanceId);
                 serverStartTimes.remove(instanceId);
@@ -485,7 +499,11 @@ public class MinecraftServerService {
     
 
     public boolean isServerRunning(Long instanceId) {
-        return serverStartTimes.containsKey(instanceId);
+        ServerInstance instance = getInstance(instanceId);
+        if (instance.getPid() == null) {
+            return false;
+        }
+        return ProcessHandle.of(instance.getPid()).map(ProcessHandle::isAlive).orElse(false);
     }
 
     @Async
@@ -679,61 +697,46 @@ public class MinecraftServerService {
             throw new RuntimeException("Could not create directory for server instance", e);
         }
 
-        Path jarPath = instancePath.resolve(instance.getJarFileName());
+        try {
+            Files.writeString(instancePath.resolve("eula.txt"), "eula=true");
+            webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("EULA accepted."));
+        } catch (IOException e) {
+            webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Failed to write eula.txt: " + e.getMessage()));
+            throw new RuntimeException("Could not write eula.txt", e);
+        }
 
-        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Downloading server JAR from " + template.downloadUrl() + "..."));
+        for (var step : template.installationSteps()) {
+            String command = step.command()
+                    .replace("{downloadUrl}", template.downloadUrl())
+                    .replace("{jar}", instance.getJarFileName())
+                    .replace("{ram}", parseRam(template.hardwareRequirements()));
 
-        serverDownloaderService.downloadFile(template.downloadUrl(), jarPath)
-                .thenRun(() -> {
-                    webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Download complete."));
-                    try {
-                        Files.writeString(instancePath.resolve("eula.txt"), "eula=true");
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("EULA accepted."));
-                    } catch (IOException e) {
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Failed to write eula.txt: " + e.getMessage()));
-                        throw new RuntimeException("Could not write eula.txt", e);
-                    }
-
-                    // Run the server once to generate files
-                    try {
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Generating server files... This may take a moment."));
-                        
-                        String ramRequirement = template.hardwareRequirements();
-                        String maxRam = parseRam(ramRequirement);
-                        String initialRam = "1G"; // Sensible default
-
-                        List<String> command = List.of(
-                            "java",
-                            "-Xms" + initialRam,
-                            "-Xmx" + maxRam,
-                            "-jar",
-                            instance.getJarFileName(),
-                            "nogui"
-                        );
-
-                        ProcessBuilder processBuilder = new ProcessBuilder(command);
+            try {
+                switch (step.type()) {
+                    case "DOWNLOAD":
+                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Downloading server files..."));
+                        Path jarPath = instancePath.resolve(instance.getJarFileName());
+                        serverDownloaderService.downloadFile(command, jarPath).join();
+                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Download complete."));
+                        break;
+                    case "RUN":
+                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Executing command: " + command));
+                        ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
                         processBuilder.directory(instancePath.toFile());
                         Process process = processBuilder.start();
-                        
-                        boolean exited = process.waitFor(90, TimeUnit.SECONDS); // Increased timeout for first run
-                        if (exited) {
-                             webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Server process completed initial setup."));
-                        } else {
-                             webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Server generation is taking a while, stopping process to continue..."));
-                             process.destroyForcibly();
-                        }
-                        
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Server files generated successfully."));
-                    } catch (IOException | InterruptedException e) {
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Failed to generate server files: " + e.getMessage()));
-                        log.error("Error running server once for instance {}", instance.getId(), e);
-                    }
-
-                    webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Installation finished successfully!"));
-                }).exceptionally(ex -> {
-                    webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Installation failed: " + ex.getMessage()));
-                    return null;
-                });
+                        process.waitFor(2, TimeUnit.MINUTES);
+                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Command executed."));
+                        break;
+                    default:
+                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Unknown installation step type: " + step.type()));
+                }
+            } catch (Exception e) {
+                webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Installation failed at step " + step.type() + ": " + e.getMessage()));
+                log.error("Installation failed for instance {}", instanceId, e);
+                return;
+            }
+        }
+        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Installation finished successfully!"));
     }
 
     private String parseRam(String ramRequirement) {

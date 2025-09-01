@@ -24,7 +24,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 @Service
 public class WebSocketService {
-
     private final Map<Long, CopyOnWriteArraySet<WebSocketSession>> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
     private MinecraftServerService minecraftServerService;

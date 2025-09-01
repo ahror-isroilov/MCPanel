@@ -8,7 +8,11 @@
     "hardwareRequirements": "RAM 2GB+",
     "imageUrl": "/images/paper.jpg",
     "downloadUrl": "https://api.papermc.io/v2/projects/paper/versions/1.21.1/builds/133/downloads/paper-1.21.1-133.jar",
-    "type": "Paper"
+    "type": "Paper",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
+    ]
   },
   {
     "id": "paper-1.20.4",
@@ -19,7 +23,11 @@
     "hardwareRequirements": "RAM 2GB+",
     "imageUrl": "/images/paper.jpg",
     "downloadUrl": "https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/448/downloads/paper-1.20.4-448.jar",
-    "type": "Paper"
+    "type": "Paper",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
+    ]
   },
   {
     "id": "forge-1.20.1",
@@ -30,7 +38,12 @@
     "hardwareRequirements": "RAM 4GB+",
     "imageUrl": "/images/forge.jpg",
     "downloadUrl": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.2.0/forge-1.20.1-47.2.0-installer.jar",
-    "type": "Forge"
+    "type": "Forge",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -jar {jar} --installServer"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} @user_jvm_args.txt @libraries/net/minecraftforge/forge/1.20.1-47.2.0/win_args.txt nogui"}
+    ]
   },
   {
     "id": "forge-1.18.2",
@@ -41,7 +54,12 @@
     "hardwareRequirements": "RAM 4GB+",
     "imageUrl": "/images/forge.jpg",
     "downloadUrl": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.18.2-40.2.1/forge-1.18.2-40.2.1-installer.jar",
-    "type": "Forge"
+    "type": "Forge",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -jar {jar} --installServer"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} @user_jvm_args.txt @libraries/net/minecraftforge/forge/1.18.2-40.2.1/win_args.txt nogui"}
+    ]
   },
   {
     "id": "fabric-1.21.1",
@@ -52,7 +70,12 @@
     "hardwareRequirements": "RAM 2GB+",
     "imageUrl": "/images/fabric.jpg",
     "downloadUrl": "https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.15.11/0.11.1/server/jar",
-    "type": "Fabric"
+    "type": "Fabric",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -jar {jar} server -mcversion 1.21.1 -loader 0.15.11 -downloadMinecraft"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar fabric-server-launch.jar nogui"}
+    ]
   },
   {
     "id": "vanilla-1.21.1",
@@ -63,7 +86,11 @@
     "hardwareRequirements": "RAM 1GB+",
     "imageUrl": "/images/vanilla.jpg",
     "downloadUrl": "https://piston-data.mojang.com/v1/objects/422117b2d593e435196b05f0b0188d14f826b56d/server.jar",
-    "type": "Vanilla"
+    "type": "Vanilla",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
+    ]
   },
   {
     "id": "vanilla-1.20.4",
@@ -74,6 +101,10 @@
     "hardwareRequirements": "RAM 1GB+",
     "imageUrl": "/images/vanilla.jpg",
     "downloadUrl": "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b5ed26e44a64101c/server.jar",
-    "type": "Vanilla"
+    "type": "Vanilla",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
+    ]
   }
 ]

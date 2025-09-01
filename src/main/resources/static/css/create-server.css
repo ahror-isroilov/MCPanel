@@ -1,4 +1,3 @@
-/* Back Button */
 .back-to-servers {
     margin-bottom: 24px;
 }
@@ -56,6 +55,11 @@
     background-clip: text;
     margin-bottom: 16px;
     line-height: 1.2;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.page-title.fade-out {
+    opacity: 0;
 }
 
 .header-description {
@@ -218,7 +222,6 @@
     margin-right: 8px;
 }
 
-/* Modal Styles */
 .modal {
     position: fixed;
     z-index: 1000;
