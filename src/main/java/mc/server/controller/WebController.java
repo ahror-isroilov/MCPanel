@@ -3,7 +3,7 @@ package mc.server.controller;
 import lombok.RequiredArgsConstructor;
 import mc.server.config.InitialSetupRunner;
 import mc.server.repository.ServerInstanceRepository;
-import mc.server.service.MinecraftServerService;
+import mc.server.service.server.MinecraftServerService;
 import mc.server.service.SystemMonitoringService;
 import mc.server.service.TemplateService;
 import org.springframework.stereotype.Controller;

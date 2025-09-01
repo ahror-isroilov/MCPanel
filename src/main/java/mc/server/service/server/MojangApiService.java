@@ -1,4 +1,4 @@
-package mc.server.service;
+package mc.server.service.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

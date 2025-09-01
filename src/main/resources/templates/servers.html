@@ -28,51 +28,6 @@
 
         <!-- Server Grid - Display if servers exist -->
         <div class="server-grid" th:if="${!#lists.isEmpty(servers)}">
-            <div class="server-card" th:each="server : ${servers}" th:data-server-id="${server.id}">
-                <div class="server-card-content">
-                    <div class="card-header">
-                        <div class="header-top">
-                            <div class="status-indicator offline"></div>
-                            <div class="header-content">
-                                <a class="server-name" th:href="@{/servers/{id}/server(id=${server.id})}" th:text="${server.name}"></a>
-                            </div>
-                            <div class="card-actions">
-                                <button class="start-btn">Start</button>
-                                <button class="stop-btn" style="display: none;">Stop</button>
-                                <button class="delete-btn" title="Delete server">
-                                    <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
-                                        <polyline points="3,6 5,6 21,6"></polyline>
-                                        <path d="m19,6v14a2,2 0,0 1,-2,2H7a2,2 0,0 1,-2,-2V6m3,0V4a2,2 0,0 1,2,-2h4a2,2 0,0 1,2,2v2"></path>
-                                        <line x1="10" x2="10" y1="11" y2="17"></line>
-                                        <line x1="14" x2="14" y1="11" y2="17"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="server-tags">
-                            <span class="version-tag" th:if="${server.version}" th:text="${server.version}"></span>
-                            <span class="server-type-tag" th:if="${server.serverType}" th:text="${server.serverType}"></span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="server-details">
-                            <div class="detail-item">
-                                <span class="detail-label">Status:</span>
-                                <span class="detail-value status-text">Offline</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Server Port:</span>
-                                <span class="detail-value" th:text="${server.port}"></span>
-                            </div>
-                            <div class="detail-item" th:if="${server.rconEnabled}">
-                                <span class="detail-label">RCON Port:</span>
-                                <span class="detail-value" th:text="${server.rconPort}"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="server-card add-server-card">
                 <a href="/servers/create">
                     <div class="card-header">+</div>

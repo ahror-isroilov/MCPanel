@@ -1,11 +1,16 @@
-package mc.server.service;
+package mc.server.service.server;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mc.server.model.InstallationStatus;
 import mc.server.model.ServerInstance;
 import mc.server.model.ServerStatus;
 import mc.server.model.ConsoleMessage;
 import mc.server.repository.ServerInstanceRepository;
+import mc.server.service.RconService;
+import mc.server.service.SystemMonitoringService;
+import mc.server.service.TemplateService;
+import mc.server.service.WebSocketService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -65,6 +70,10 @@ public class MinecraftServerService {
             var systemStats = systemMonitoringService.getSystemStats();
             String uptime = getServerUptime(instanceId);
 
+            double instanceRamUsage = systemMonitoringService.getInstanceRamUsage(instance);
+            double allocatedRam = systemMonitoringService.parseMemoryToMb(instance.getAllocatedMemory());
+            double instanceDiskUsage = systemMonitoringService.getInstanceDiskUsage(instance);
+
             return ServerStatus.builder()
                     .instanceId(instance.getId())
                     .name(instance.getName())
@@ -84,6 +93,9 @@ public class MinecraftServerService {
                     .worldName(getWorldName(instanceId))
                     .diskUsage((Double) systemStats.get("diskUsage"))
                     .totalDisk((Double) systemStats.get("totalDisk"))
+                    .instanceRamUsage(instanceRamUsage)
+                    .allocatedRam(allocatedRam)
+                    .instanceDiskUsage(instanceDiskUsage)
                     .build();
 
         } catch (Exception e) {
@@ -94,6 +106,7 @@ public class MinecraftServerService {
 
     private ServerStatus buildOfflineServerStatus(ServerInstance instance) {
         var systemStats = systemMonitoringService.getSystemStats();
+        double instanceDiskUsage = systemMonitoringService.getInstanceDiskUsage(instance);
 
         return ServerStatus.builder()
                 .instanceId(instance.getId())
@@ -114,6 +127,9 @@ public class MinecraftServerService {
                 .worldName("Unknown")
                 .diskUsage((Double) systemStats.get("diskUsage"))
                 .totalDisk((Double) systemStats.get("totalDisk"))
+                .instanceRamUsage(0)
+                .allocatedRam(systemMonitoringService.parseMemoryToMb(instance.getAllocatedMemory()))
+                .instanceDiskUsage(instanceDiskUsage)
                 .build();
     }
 
@@ -423,12 +439,22 @@ public class MinecraftServerService {
     }
 
     @Async
-    public CompletableFuture<Boolean> startServer(Long instanceId) {
+    public CompletableFuture<Boolean> startServer(Long instanceId, Path javaExecutable, String memory) {
         ServerInstance instance = getInstance(instanceId);
         log.info("Starting Minecraft server instance {}...", instanceId);
         return CompletableFuture.supplyAsync(() -> {
             try {
-                ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", instance.getJarFileName(), "nogui");
+                String javaCommand = (javaExecutable != null) ? javaExecutable.toString() : "java";
+                
+                ProcessBuilder processBuilder = new ProcessBuilder(
+                    javaCommand,
+                    "-Xms" + memory,
+                    "-Xmx" + memory,
+                    "-jar",
+                    instance.getJarFileName(),
+                    "nogui"
+                );
+                
                 processBuilder.directory(Paths.get(instance.getInstancePath()).toFile());
                 Process process = processBuilder.start();
                 instance.setPid((int) process.pid());
@@ -487,9 +513,21 @@ public class MinecraftServerService {
     @Async
     public CompletableFuture<Boolean> restartServer(Long instanceId) {
         log.info("Restarting Minecraft server instance {}...", instanceId);
+        
+        ServerInstance instance = getInstance(instanceId);
+        var template = templateService.getTemplateById(instance.getServerType());
+
         return stopServer(instanceId).thenCompose(stopped -> {
             if (stopped) {
-                return startServer(instanceId);
+                try {
+                    Path javaExecutable = applicationContext.getBean(mc.server.service.CrossPlatformJavaService.class)
+                        .ensureJavaAvailable(instanceId, template.systemRequirements());
+                    
+                    return startServer(instanceId, javaExecutable, instance.getAllocatedMemory());
+                } catch (Exception e) {
+                    log.error("Failed to get Java executable for restart", e);
+                    return CompletableFuture.completedFuture(false);
+                }
             } else {
                 return CompletableFuture.completedFuture(false);
             }
@@ -647,7 +685,7 @@ public class MinecraftServerService {
         return text.replaceAll("§[0-9a-fk-or]", "");
     }
 
-    private ServerInstance getInstance(Long instanceId) {
+    public ServerInstance getInstance(Long instanceId) {
         return serverInstanceRepository.findById(instanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid instanceId: " + instanceId));
     }
@@ -666,91 +704,17 @@ public class MinecraftServerService {
                 .name(instanceName)
                 .version(template.name())
                 .serverType(template.type())
+                .templateId(template.id())
                 .instancePath(instancePath.toString())
                 .jarFileName(jarFileName)
                 .ip("0.0.0.0")
-                .port(25565) // default port
+                .port(25565)
                 .rconEnabled(false)
+                .status(InstallationStatus.PENDING_INSTALLATION)
+                .statusMessage("Server created, awaiting installation")
                 .build();
 
         return serverInstanceRepository.save(instance);
-    }
-
-    @Async
-    public void downloadAndInstallServer(Long instanceId, String templateId) {
-        ServerInstance instance = getInstance(instanceId);
-        var template = templateService.getTemplates().stream()
-                .filter(t -> t.id().equals(templateId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid templateId: " + templateId));
-
-        WebSocketService webSocketService = applicationContext.getBean(WebSocketService.class);
-
-        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Starting installation for " + instance.getName() + "..."));
-
-        Path instancePath = Paths.get(instance.getInstancePath());
-        try {
-            Files.createDirectories(instancePath);
-            webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Created directory: " + instancePath));
-        } catch (IOException e) {
-            webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Failed to create directory: " + e.getMessage()));
-            throw new RuntimeException("Could not create directory for server instance", e);
-        }
-
-        try {
-            Files.writeString(instancePath.resolve("eula.txt"), "eula=true");
-            webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("EULA accepted."));
-        } catch (IOException e) {
-            webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Failed to write eula.txt: " + e.getMessage()));
-            throw new RuntimeException("Could not write eula.txt", e);
-        }
-
-        for (var step : template.installationSteps()) {
-            String command = step.command()
-                    .replace("{downloadUrl}", template.downloadUrl())
-                    .replace("{jar}", instance.getJarFileName())
-                    .replace("{ram}", parseRam(template.hardwareRequirements()));
-
-            try {
-                switch (step.type()) {
-                    case "DOWNLOAD":
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Downloading server files..."));
-                        Path jarPath = instancePath.resolve(instance.getJarFileName());
-                        serverDownloaderService.downloadFile(command, jarPath).join();
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Download complete."));
-                        break;
-                    case "RUN":
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Executing command: " + command));
-                        ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
-                        processBuilder.directory(instancePath.toFile());
-                        Process process = processBuilder.start();
-                        process.waitFor(2, TimeUnit.MINUTES);
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Command executed."));
-                        break;
-                    default:
-                        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Unknown installation step type: " + step.type()));
-                }
-            } catch (Exception e) {
-                webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.error("Installation failed at step " + step.type() + ": " + e.getMessage()));
-                log.error("Installation failed for instance {}", instanceId, e);
-                return;
-            }
-        }
-        webSocketService.broadcastConsoleMessage(instanceId, ConsoleMessage.info("Installation finished successfully!"));
-    }
-
-    private String parseRam(String ramRequirement) {
-        if (ramRequirement == null || !ramRequirement.toLowerCase().contains("ram")) {
-            return "2G"; // Default fallback
-        }
-        // Example format: "RAM 2GB+"
-        String[] parts = ramRequirement.split("\\s+");
-        for (String part : parts) {
-            if (part.toLowerCase().matches("\\d+[gm]b?(\\+)?")) {
-                return part.replaceAll("[^\\dGMgm]", "").toUpperCase();
-            }
-        }
-        return "2G"; // Default if parsing fails
     }
 
     public void deleteServerInstance(Long instanceId) throws IOException {
@@ -759,12 +723,10 @@ public class MinecraftServerService {
         ServerInstance instance = serverInstanceRepository.findById(instanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Server instance not found"));
         
-        // Stop the server if it's running
         if (isServerRunning(instanceId)) {
             log.info("Stopping server {} before deletion", instance.getName());
             stopServer(instanceId);
-            
-            // Wait a moment for the server to fully stop
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -772,7 +734,6 @@ public class MinecraftServerService {
             }
         }
         
-        // Clean up server processes and data
         serverStartTimes.remove(instanceId);
         onlinePlayers.remove(instanceId);
         currentPlayerCounts.remove(instanceId);
@@ -781,14 +742,12 @@ public class MinecraftServerService {
         lastKnownTps.remove(instanceId);
         tpsDebugActive.remove(instanceId);
         
-        // Delete server files
         Path serverPath = Paths.get(instance.getInstancePath());
         if (Files.exists(serverPath)) {
             log.info("Deleting server files at: {}", serverPath);
             deleteDirectoryRecursively(serverPath);
         }
-        
-        // Delete from database
+
         serverInstanceRepository.deleteById(instanceId);
         
         log.info("Successfully deleted server instance: {}", instance.getName());

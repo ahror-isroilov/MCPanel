@@ -1,4 +1,4 @@
-package mc.server.service;
+package mc.server.service.server;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,10 @@ import mc.server.model.ConsoleMessage;
 import mc.server.model.InstallationStatus;
 import mc.server.model.ServerInstance;
 import mc.server.repository.ServerInstanceRepository;
+import mc.server.service.CrossPlatformJavaService;
+import mc.server.service.PortManagerService;
+import mc.server.service.TemplateService;
+import mc.server.service.WebSocketService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -43,25 +47,17 @@ public class ServerInstallationService {
                 ConsoleMessage.info("🚀 Installation started for " + instance.getName()));
             updateInstanceStatus(instanceId, InstallationStatus.DOWNLOADING, "Starting installation...");
             
-            // Ensure Java is available (system or portable)
             Path javaExecutable = crossPlatformJavaService.ensureJavaAvailable(instanceId, template.systemRequirements());
-            
-            // Create server directory
             createServerDirectory(instance);
-            
-            // Accept EULA
+
             acceptEula(instance);
-            
-            // Execute installation steps
+
             executeInstallationSteps(instance, template);
-            
-            // Generate baseline server files by running server once
+
             generateServerFiles(instance, javaExecutable);
-            
-            // Configure server (ports, RCON, properties)
-            configureServer(instance);
-            
-            // Installation complete
+
+            configureServer(instance, template);
+
             updateInstanceStatus(instanceId, InstallationStatus.STOPPED, "Installation completed successfully!");
             webSocketService.broadcastConsoleMessage(instanceId, 
                 ConsoleMessage.info("🎉 Server installation completed successfully! Your server is ready to start."));
@@ -121,15 +117,23 @@ public class ServerInstallationService {
                     ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
                     processBuilder.directory(Paths.get(instance.getInstancePath()).toFile());
                     processBuilder.redirectErrorStream(true);
-                    
+
                     Process process = processBuilder.start();
-                    boolean finished = process.waitFor(5, TimeUnit.MINUTES); // 5 minute timeout
-                    
+
+                    try (var reader = process.inputReader()) {
+                        reader.lines().forEach(line -> {
+                            webSocketService.broadcastConsoleMessage(instance.getId(), ConsoleMessage.info(line));
+                            log.info("[Installer] {}", line);
+                        });
+                    }
+
+                    boolean finished = process.waitFor(30, TimeUnit.SECONDS);
+
                     if (!finished) {
                         process.destroyForcibly();
-                        throw new RuntimeException("Installation command timed out after 5 minutes");
+                        throw new RuntimeException("Installation command timed out after 1 minute");
                     }
-                    
+
                     int exitCode = process.exitValue();
                     if (exitCode != 0) {
                         throw new RuntimeException("Installation command failed with exit code: " + exitCode);
@@ -155,8 +159,7 @@ public class ServerInstallationService {
             ConsoleMessage.info("Running server for the first time to generate baseline files..."));
         
         Path instancePath = Paths.get(instance.getInstancePath());
-        
-        // Use portable Java if provided, otherwise use system java
+
         String javaCommand = (javaExecutable != null) ? javaExecutable.toString() : "java";
         
         ProcessBuilder processBuilder = new ProcessBuilder(javaCommand, "-Xms512M", "-Xmx1G", "-jar", instance.getJarFileName(), "nogui");
@@ -265,7 +268,7 @@ public class ServerInstallationService {
         log.info("File verification completed for instance path: {}", instancePath);
     }
     
-    private void configureServer(ServerInstance instance) {
+    private void configureServer(ServerInstance instance, ServerTemplate template) {
         updateInstanceStatus(instance.getId(), InstallationStatus.CONFIGURING, "Configuring server settings...");
         
         try {
@@ -275,6 +278,10 @@ public class ServerInstallationService {
             
             // Generate secure RCON password
             String rconPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+            
+            // Parse and set allocated memory
+            String allocatedMemory = parseRam(template.hardwareRequirements());
+            instance.setAllocatedMemory(allocatedMemory);
             
             // Update instance with allocated ports and RCON settings
             instance.setPort(gamePort);
@@ -395,16 +402,15 @@ public class ServerInstallationService {
     
     private String parseRam(String ramRequirement) {
         if (ramRequirement == null || !ramRequirement.toLowerCase().contains("ram")) {
-            return "2G"; // Default fallback
+            return "2G";
         }
-        // Example format: "RAM 2GB+"
         String[] parts = ramRequirement.split("\\s+");
         for (String part : parts) {
             if (part.toLowerCase().matches("\\d+[gm]b?(\\+)?")) {
                 return part.replaceAll("[^\\dGMgm]", "").toUpperCase();
             }
         }
-        return "2G"; // Default if parsing fails
+        return "2G";
     }
     
     private void updateInstanceStatus(Long instanceId, InstallationStatus status, String message) {

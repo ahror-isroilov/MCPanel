@@ -30,35 +30,33 @@
     ]
   },
   {
-    "id": "forge-1.20.1",
-    "name": "Forge 1.20.1",
-    "tags": ["Forge", "1.20.1", "Mods"],
-    "description": "The essential modding API for Minecraft 1.20.1.",
+    "id": "paper-1.19.4",
+    "name": "Paper 1.19.4",
+    "tags": ["Paper", "1.19.4", "Plugins"],
+    "description": "A popular and stable Paper version for 1.19.4.",
     "systemRequirements": "Java 17+",
-    "hardwareRequirements": "RAM 4GB+",
-    "imageUrl": "/images/forge.jpg",
-    "downloadUrl": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.2.0/forge-1.20.1-47.2.0-installer.jar",
-    "type": "Forge",
+    "hardwareRequirements": "RAM 2GB+",
+    "imageUrl": "/images/paper.jpg",
+    "downloadUrl": "https://api.papermc.io/v2/projects/paper/versions/1.19.4/builds/550/downloads/paper-1.19.4-550.jar",
+    "type": "Paper",
     "installationSteps": [
       {"type": "DOWNLOAD", "command": "{downloadUrl}"},
-      {"type": "RUN", "command": "java -jar {jar} --installServer"},
-      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} @user_jvm_args.txt @libraries/net/minecraftforge/forge/1.20.1-47.2.0/win_args.txt nogui"}
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
     ]
   },
   {
-    "id": "forge-1.18.2",
-    "name": "Forge 1.18.2",
-    "tags": ["Forge", "1.18.2", "Mods"],
-    "description": "A popular and stable Forge version for modding.",
+    "id": "paper-1.18.2",
+    "name": "Paper 1.18.2",
+    "tags": ["Paper", "1.18.2", "Plugins"],
+    "description": "A widely-used Paper version for the Caves & Cliffs update.",
     "systemRequirements": "Java 17+",
-    "hardwareRequirements": "RAM 4GB+",
-    "imageUrl": "/images/forge.jpg",
-    "downloadUrl": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.18.2-40.2.1/forge-1.18.2-40.2.1-installer.jar",
-    "type": "Forge",
+    "hardwareRequirements": "RAM 2GB+",
+    "imageUrl": "/images/paper.jpg",
+    "downloadUrl": "https://api.papermc.io/v2/projects/paper/versions/1.18.2/builds/388/downloads/paper-1.18.2-388.jar",
+    "type": "Paper",
     "installationSteps": [
       {"type": "DOWNLOAD", "command": "{downloadUrl}"},
-      {"type": "RUN", "command": "java -jar {jar} --installServer"},
-      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} @user_jvm_args.txt @libraries/net/minecraftforge/forge/1.18.2-40.2.1/win_args.txt nogui"}
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
     ]
   },
   {
@@ -69,11 +67,27 @@
     "systemRequirements": "Java 21+",
     "hardwareRequirements": "RAM 2GB+",
     "imageUrl": "/images/fabric.jpg",
-    "downloadUrl": "https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.15.11/0.11.1/server/jar",
+    "downloadUrl": "https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar",
     "type": "Fabric",
     "installationSteps": [
       {"type": "DOWNLOAD", "command": "{downloadUrl}"},
-      {"type": "RUN", "command": "java -jar {jar} server -mcversion 1.21.1 -loader 0.15.11 -downloadMinecraft"},
+      {"type": "RUN", "command": "java -jar {jar} server -mcversion 1.21.1 -downloadMinecraft"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar fabric-server-launch.jar nogui"}
+    ]
+  },
+  {
+    "id": "fabric-1.20.4",
+    "name": "Fabric 1.20.4",
+    "tags": ["Fabric", "1.20.4", "Mods"],
+    "description": "A stable Fabric version for 1.20.4 mods.",
+    "systemRequirements": "Java 17+",
+    "hardwareRequirements": "RAM 2GB+",
+    "imageUrl": "/images/fabric.jpg",
+    "downloadUrl": "https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar",
+    "type": "Fabric",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -jar {jar} server -mcversion 1.20.4 -downloadMinecraft"},
       {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar fabric-server-launch.jar nogui"}
     ]
   },
@@ -85,7 +99,7 @@
     "systemRequirements": "Java 21+",
     "hardwareRequirements": "RAM 1GB+",
     "imageUrl": "/images/vanilla.jpg",
-    "downloadUrl": "https://piston-data.mojang.com/v1/objects/422117b2d593e435196b05f0b0188d14f826b56d/server.jar",
+    "downloadUrl": "https://launcher.mojang.com/v1/objects/422117b2d593e435196b05f0b0188d14f826b56d/server.jar",
     "type": "Vanilla",
     "installationSteps": [
       {"type": "DOWNLOAD", "command": "{downloadUrl}"},
@@ -100,7 +114,37 @@
     "systemRequirements": "Java 17+",
     "hardwareRequirements": "RAM 1GB+",
     "imageUrl": "/images/vanilla.jpg",
-    "downloadUrl": "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b5ed26e44a64101c/server.jar",
+    "downloadUrl": "https://launcher.mojang.com/v1/objects/8dd1a28015f51b1803213892b5ed26e44a64101c/server.jar",
+    "type": "Vanilla",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
+    ]
+  },
+  {
+    "id": "vanilla-1.19.4",
+    "name": "Vanilla 1.19.4",
+    "tags": ["Vanilla", "1.19.4"],
+    "description": "The official server for The Wild Update.",
+    "systemRequirements": "Java 17+",
+    "hardwareRequirements": "RAM 1GB+",
+    "imageUrl": "/images/vanilla.jpg",
+    "downloadUrl": "https://launcher.mojang.com/v1/objects/8f3112a1049751cc472ec13e397e0330a3ca0a88/server.jar",
+    "type": "Vanilla",
+    "installationSteps": [
+      {"type": "DOWNLOAD", "command": "{downloadUrl}"},
+      {"type": "RUN", "command": "java -Xms1G -Xmx{ram} -jar {jar} nogui"}
+    ]
+  },
+  {
+    "id": "vanilla-1.18.2",
+    "name": "Vanilla 1.18.2",
+    "tags": ["Vanilla", "1.18.2"],
+    "description": "The official server for the Caves & Cliffs: Part II update.",
+    "systemRequirements": "Java 17+",
+    "hardwareRequirements": "RAM 1GB+",
+    "imageUrl": "/images/vanilla.jpg",
+    "downloadUrl": "https://piston-data.mojang.com/v1/objects/c8f83c5655308435b3dcf03c06d9fe8740a77469/server.jar",
     "type": "Vanilla",
     "installationSteps": [
       {"type": "DOWNLOAD", "command": "{downloadUrl}"},

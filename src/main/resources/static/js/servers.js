@@ -107,6 +107,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!stopBtn.classList.contains('loading')) {
             stopBtn.style.display = server.online ? 'inline-flex' : 'none';
         }
+
+        // Update new metrics
+        const ramUsageEl = card.querySelector('.ram-usage-value');
+        const diskUsageEl = card.querySelector('.disk-usage-value');
+        const portEl = card.querySelector('.server-port');
+
+        if (portEl) {
+            portEl.textContent = `:${server.port}`;
+        }
+
+        if (ramUsageEl) {
+            const ramUsage = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
+            ramUsageEl.textContent = ramUsage;
+        }
+
+        if (diskUsageEl) {
+            diskUsageEl.textContent = `${server.instanceDiskUsage.toFixed(2)} MB`;
+        }
     };
 
     const createServerCard = (server) => {
@@ -122,32 +140,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const version = server.version || 'Unknown';
         const serverType = server.serverType || 'Paper';
 
+        const ramUsage = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
+        const diskUsage = `${server.instanceDiskUsage.toFixed(2)} MB`;
+
         card.innerHTML = `
         <div class="server-card-content">
-        <div class="card-header">
-            <div class="header-top">
-                <div class="status-indicator ${onlineStatus}"></div>
-                <div class="header-content">
-                    <a href="/servers/${server.instanceId}/server" class="server-name">${server.name}</a>
+            <div class="card-header">
+                <div class="header-top">
+                    <div class="status-indicator ${onlineStatus}"></div>
+                    <div class="header-content">
+                        <a href="/servers/${server.instanceId}/server" class="server-name">${server.name}</a>
+                        <span class="server-port">:${server.port}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="start-btn" style="display: ${startBtnDisplay};">Start</button>
+                        <button class="stop-btn" style="display: ${stopBtnDisplay};">Stop</button>
+                        <button class="delete-btn" title="Delete server">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"></polyline>
+                                <path d="m19,6v14a2,2 0,0 1,-2,2H7a2,2 0,0 1,-2,-2V6m3,0V4a2,2 0,0 1,2,-2h4a2,2 0,0 1,2,2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="start-btn" style="display: ${startBtnDisplay};">Start</button>
-                    <button class="stop-btn" style="display: ${stopBtnDisplay};">Stop</button>
-                    <button class="delete-btn" title="Delete server">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3,6 5,6 21,6"></polyline>
-                            <path d="m19,6v14a2,2 0,0 1,-2,2H7a2,2 0,0 1,-2,-2V6m3,0V4a2,2 0,0 1,2,-2h4a2,2 0,0 1,2,2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                    </button>
+                <div class="server-tags">
+                    ${version !== 'Unknown' ? `<span class="version-tag">${version}</span>` : ''}
+                    ${serverType !== 'Unknown' ? `<span class="server-type-tag">${serverType}</span>` : ''}
                 </div>
             </div>
-            <div class="server-tags">
-                ${version !== 'Unknown' ? `<span class="version-tag">${version}</span>` : ''}
-                ${serverType !== 'Unknown' ? `<span class="server-type-tag">${serverType}</span>` : ''}
-            </div>
-        </div>
             <div class="card-body">
                 <div class="server-details">
                     <div class="detail-item">
@@ -155,15 +177,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="detail-value status-text">${onlineStatus}</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Server Port:</span>
-                        <span class="detail-value">${server.port}</span>
+                        <span class="detail-label">RAM Usage:</span>
+                        <span class="detail-value ram-usage-value">${ramUsage}</span>
                     </div>
-                    ${server.rconEnabled ? `
                     <div class="detail-item">
-                        <span class="detail-label">RCON Port:</span>
-                        <span class="detail-value">${server.rconPort}</span>
+                        <span class="detail-label">Disk Usage:</span>
+                        <span class="detail-value disk-usage-value">${diskUsage}</span>
                     </div>
-                    ` : ''}
                 </div>
             </div>
         </div>

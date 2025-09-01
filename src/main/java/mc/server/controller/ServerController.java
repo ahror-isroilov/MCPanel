@@ -13,11 +13,15 @@ import mc.server.dto.WhitelistEntry;
 import mc.server.model.ConsoleMessage;
 import mc.server.model.ServerStatus;
 import mc.server.service.*;
+import mc.server.service.server.MinecraftServerService;
+import mc.server.service.server.ServerPropertiesService;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +40,7 @@ public class ServerController {
     private final WebSocketService webSocketService;
     private final LogMonitoringService logMonitoringService;
     private final RconService rconService;
+    private final ApplicationContext applicationContext;
 
     @GetMapping("/status")
     public ResponseEntity<ApiResponse<ServerStatus>> getServerStatus(@PathVariable Long instanceId) {
@@ -48,8 +53,6 @@ public class ServerController {
                     .body(ApiResponse.error("Failed to get server status"));
         }
     }
-
-    
 
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDetailedServerInfo(@PathVariable Long instanceId) {
@@ -107,7 +110,15 @@ public class ServerController {
                 ConsoleMessage.info("[ADMIN] Starting server...")
         );
 
-        return minecraftServerService.startServer(instanceId)
+        try {
+            var instance = minecraftServerService.getInstance(instanceId);
+            var template = applicationContext.getBean(mc.server.service.TemplateService.class)
+                .getTemplateById(instance.getTemplateId());
+
+            Path javaExecutable = applicationContext.getBean(mc.server.service.CrossPlatformJavaService.class)
+                .ensureJavaAvailable(instanceId, template.systemRequirements());
+
+            return minecraftServerService.startServer(instanceId, javaExecutable, instance.getAllocatedMemory())
                 .thenApply(success -> {
                     if (success) {
                         String message = "Server start command executed successfully";
@@ -118,7 +129,7 @@ public class ServerController {
                     } else {
                         String error = "Failed to start server";
                         webSocketService.broadcastConsoleMessage(instanceId,
-                                ConsoleMessage.info("[ERROR] " + error)
+                                ConsoleMessage.error("[ERROR] " + error)
                         );
                         return ResponseEntity.internalServerError()
                                 .body(ApiResponse.error(error));
@@ -127,8 +138,15 @@ public class ServerController {
                 .exceptionally(throwable -> {
                     log.error("Exception starting server for instance {}", instanceId, throwable);
                     return ResponseEntity.internalServerError()
-                            .body(ApiResponse.error("Exception occurred while starting server"));
+                            .body(ApiResponse.error("Exception occurred while starting server: " + throwable.getMessage()));
                 });
+        } catch (Exception e) {
+            log.error("Pre-start validation failed for instance {}", instanceId, e);
+            return CompletableFuture.completedFuture(
+                ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Failed to initiate server start: " + e.getMessage()))
+            );
+        }
     }
 
     @PostMapping("/stop")

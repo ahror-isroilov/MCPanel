@@ -1,9 +1,11 @@
 package mc.server.service;
 
 import lombok.extern.slf4j.Slf4j;
+import mc.server.model.ServerInstance;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -11,8 +13,12 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -57,6 +63,80 @@ public class SystemMonitoringService {
         return stats;
     }
 
+    public double getInstanceRamUsage(ServerInstance instance) {
+        if (instance.getPid() == null) {
+            return 0.0;
+        }
+
+        try {
+            String os = System.getProperty("os.name").toLowerCase();
+            ProcessBuilder pb;
+
+            if (os.contains("win")) {
+                pb = new ProcessBuilder("tasklist", "/fi", "pid eq " + instance.getPid(), "/fo", "csv", "/nh");
+            } else {
+                pb = new ProcessBuilder("ps", "-p", String.valueOf(instance.getPid()), "-o", "rss=");
+            }
+
+            Process process = pb.start();
+            process.waitFor(5, TimeUnit.SECONDS);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = reader.readLine();
+
+            if (line != null) {
+                if (os.contains("win")) {
+                    String[] values = line.split("\",\"");
+                    if (values.length > 4) {
+                        String memUsage = values[4].replaceAll("[^\\d]", "");
+                        return Double.parseDouble(memUsage) / 1024.0; // Convert KB to MB
+                    }
+                } else {
+                    return Double.parseDouble(line.trim()) / 1024.0; // Convert KB to MB
+                }
+            }
+        } catch (Exception e) {
+            log.error("Could not get RAM usage for instance {}: {}", instance.getName(), e.getMessage());
+        }
+        return 0.0;
+    }
+
+    public double getInstanceDiskUsage(ServerInstance instance) {
+        try {
+            Path path = Paths.get(instance.getInstancePath());
+            if (Files.exists(path)) {
+                long size = Files.walk(path)
+                                 .mapToLong(p -> p.toFile().length())
+                                 .sum();
+                return size / (1024.0 * 1024.0); // Convert bytes to MB
+            }
+        } catch (IOException e) {
+            log.error("Could not get disk usage for instance {}: {}", instance.getName(), e.getMessage());
+        }
+        return 0.0;
+    }
+
+    public double parseMemoryToMb(String memory) {
+        if (memory == null || memory.isEmpty()) {
+            return 0.0;
+        }
+        Pattern p = Pattern.compile("(\\d+)([GgMmKk])");
+        Matcher m = p.matcher(memory);
+        if (m.find()) {
+            double value = Double.parseDouble(m.group(1));
+            String unit = m.group(2).toUpperCase();
+            switch (unit) {
+                case "G":
+                    return value * 1024;
+                case "M":
+                    return value;
+                case "K":
+                    return value / 1024;
+            }
+        }
+        return 0.0;
+    }
+
+
     private double getCpuUsage() {
         try {
             Process process = Runtime.getRuntime().exec("top -bn1 | grep 'Cpu(s)'");
@@ -77,7 +157,6 @@ public class SystemMonitoringService {
             log.debug("Could not get CPU usage from top command, falling back to JMX");
         }
 
-        // Fallback to JMX
         if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
             com.sun.management.OperatingSystemMXBean sunOsBean =
                     (com.sun.management.OperatingSystemMXBean) osBean;

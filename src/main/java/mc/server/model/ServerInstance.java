@@ -1,9 +1,6 @@
 package mc.server.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,10 +20,19 @@ public class ServerInstance {
     private String jarFileName;
     private String version;
     private String serverType;
+    private String templateId;
     private String ip;
     private int port;
     private int rconPort;
     private String rconPassword;
     private boolean rconEnabled;
     private Integer pid;
+    
+    @Enumerated(EnumType.STRING)
+    private InstallationStatus status;
+    
+    @Column(length = 512)
+    private String statusMessage;
+    
+    private String allocatedMemory;
 }

@@ -12,6 +12,7 @@
 <body th:data-instance-id="${instanceId}">
 
 <div class="page-transition-wrapper">
+    <div class="notification-container" id="notification-container"></div>
     <div th:replace="~{fragments/common :: server-navbar(instanceId=${instanceId}, serverName=${instanceName}, activePage='console')}"></div>
 
     <div class="main-container">

@@ -39,4 +39,11 @@ public class TemplateService {
         }
     }
 
+    public ServerTemplate getTemplateById(String id) {
+        return templates.stream()
+                .filter(t -> t.id().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Template not found: " + id));
+    }
+
 }

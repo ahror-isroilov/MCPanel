@@ -63,9 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Instance name is required.');
             return;
         }
-
+        modal.style.display = 'none';
+        showNotification('Creating server instance...', 'info');
         try {
-            const response = await fetch('/api/servers/install', {
+            const response = await fetch('/api/servers/create-and-install', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -73,32 +74,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ instanceName, templateId }),
             });
 
-            if (response.ok) {
-                const data = await response.json();
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                showNotification('Redirecting to console...', 'success');
                 window.location.href = `/servers/${data.instanceId}/console`;
             } else {
-                const error = await response.json();
-                alert(`Error: ${error.message}`);
+                alert(`Error: ${data.error || 'Failed to create server instance'}`);
             }
         } catch (error) {
-            console.error('Failed to start installation:', error);
-            alert('An error occurred while starting the installation.');
+            console.error('Failed to create server instance:', error);
+            alert('An error occurred while creating the server instance.');
         }
     });
 
-    // Filter Logic
     const filterButtons = document.querySelectorAll('.filter-btn');
     const templateCards = document.querySelectorAll('.template-card');
 
     filterButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Update active button
             filterButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
             const filter = button.dataset.filter;
 
-            // Show/hide cards
             templateCards.forEach(card => {
                 if (filter === 'all' || card.dataset.type === filter) {
                     card.style.display = 'flex';
@@ -108,4 +107,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+    
+    function showNotification(message, type = 'success') {
+        const container = document.getElementById('notification-container');
+        if (!container) {
+            console.log('Notification: ' + message);
+            return;
+        }
+        
+        const notification = document.createElement('div');
+        notification.className = `notification alert-${type}`;
+        notification.innerHTML = `<span>${message}</span>`;
+        container.appendChild(notification);
+        setTimeout(() => {
+            notification.classList.add('removing');
+            setTimeout(() => notification.remove(), 300);
+        }, 4000);
+    }
 });

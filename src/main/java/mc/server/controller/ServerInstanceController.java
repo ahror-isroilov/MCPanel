@@ -3,7 +3,9 @@ package mc.server.controller;
 import lombok.RequiredArgsConstructor;
 import mc.server.dto.ApiResponse;
 import mc.server.model.ServerInstance;
-import mc.server.service.MinecraftServerService;
+import mc.server.service.server.MinecraftServerService;
+import mc.server.service.server.ServerInstallationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import java.util.List;
 public class ServerInstanceController {
 
     private final MinecraftServerService minecraftServerService;
+    private final ServerInstallationService serverInstallationService;
 
     @GetMapping("/statuses")
     public ResponseEntity<ApiResponse<List<ServerStatus>>> getAllServerStatuses() {
@@ -32,13 +35,41 @@ public class ServerInstanceController {
         }
     }
 
+    @GetMapping("/{instanceId}")
+    public ResponseEntity<ApiResponse<ServerInstance>> getServerInstance(@PathVariable Long instanceId) {
+        try {
+            ServerInstance instance = minecraftServerService.getInstance(instanceId);
+            return ResponseEntity.ok(ApiResponse.success(instance));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Failed to get server instance"));
+        }
+    }
+
     @PostMapping
-//...
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ServerInstance> createServerInstance(
+    public ResponseEntity<ApiResponse<ServerInstance>> createServerInstance(
             @RequestParam String name,
-            @RequestParam String version) {
-        return ResponseEntity.ok(minecraftServerService.createServerInstance(name, version));
+            @RequestParam String templateId) {
+        try {
+            // Create the server instance with PENDING_INSTALLATION status
+            ServerInstance instance = minecraftServerService.createServerInstance(name, templateId);
+            
+            // Trigger async installation
+            serverInstallationService.installServer(instance.getId(), templateId);
+            
+            // Return 202 Accepted with the newly created server object
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(ApiResponse.success(instance));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("Invalid template ID: " + templateId));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Failed to create server instance: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{instanceId}")

@@ -240,11 +240,6 @@ public class CrossPlatformJavaService {
     }
     
     private Path findJavaExecutable(Path extractDir) throws IOException {
-        Path[] possiblePaths = {
-            extractDir.resolve("bin/java"),
-            extractDir.resolve("bin/java.exe")
-        };
-        
         try (var stream = Files.walk(extractDir, 3)) {
             return stream
                 .filter(path -> path.getFileName().toString().equals("java") || 

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import mc.server.model.ConsoleMessage;
 import mc.server.model.ServerInstance;
 import mc.server.model.ServerStatus;
-import lombok.extern.slf4j.Slf4j;
 import mc.server.repository.ServerInstanceRepository;
+import mc.server.service.server.MinecraftServerService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,7 +61,11 @@ public class ScheduledTasksService {
                 systemStats.put("activeWebSocketSessions", webSocketService.getActiveSessionCount());
                 
                 for (ServerInstance instance : serverInstanceRepository.findAll()) {
-                    systemStats.put("rconConnected", rconService.testConnection(instance.getId()));
+                    if (minecraftServerService.isServerRunning(instance.getId())) {
+                        systemStats.put("rconConnected", rconService.testConnection(instance.getId()));
+                    } else {
+                        systemStats.put("rconConnected", false);
+                    }
                     // webSocketService.broadcastSystemStats(instance.getId(), systemStats);
                 }
             }
@@ -146,7 +149,7 @@ public class ScheduledTasksService {
 
             if (highCpu || highMemory || highDisk) {
                 String alertMessage = buildResourceAlert(highCpu, highMemory, highDisk);
-                log.warn(alertMessage);
+//                log.warn(alertMessage);
 
                 for (ServerInstance instance : serverInstanceRepository.findAll()) {
                     if (webSocketService.hasActiveSessions()) {
