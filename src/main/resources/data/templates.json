@@ -1,0 +1,79 @@
+[
+  {
+    "id": "paper-1.21.1",
+    "name": "Paper 1.21.1",
+    "tags": ["Paper", "1.21.1", "Plugins"],
+    "description": "High-performance server with robust plugin support.",
+    "systemRequirements": "Java 21+",
+    "hardwareRequirements": "RAM 2GB+",
+    "imageUrl": "/images/paper.jpg",
+    "downloadUrl": "https://api.papermc.io/v2/projects/paper/versions/1.21.1/builds/133/downloads/paper-1.21.1-133.jar",
+    "type": "Paper"
+  },
+  {
+    "id": "paper-1.20.4",
+    "name": "Paper 1.20.4",
+    "tags": ["Paper", "1.20.4", "Plugins"],
+    "description": "A stable and performant Paper version for 1.20.4.",
+    "systemRequirements": "Java 17+",
+    "hardwareRequirements": "RAM 2GB+",
+    "imageUrl": "/images/paper.jpg",
+    "downloadUrl": "https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/448/downloads/paper-1.20.4-448.jar",
+    "type": "Paper"
+  },
+  {
+    "id": "forge-1.20.1",
+    "name": "Forge 1.20.1",
+    "tags": ["Forge", "1.20.1", "Mods"],
+    "description": "The essential modding API for Minecraft 1.20.1.",
+    "systemRequirements": "Java 17+",
+    "hardwareRequirements": "RAM 4GB+",
+    "imageUrl": "/images/forge.jpg",
+    "downloadUrl": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.2.0/forge-1.20.1-47.2.0-installer.jar",
+    "type": "Forge"
+  },
+  {
+    "id": "forge-1.18.2",
+    "name": "Forge 1.18.2",
+    "tags": ["Forge", "1.18.2", "Mods"],
+    "description": "A popular and stable Forge version for modding.",
+    "systemRequirements": "Java 17+",
+    "hardwareRequirements": "RAM 4GB+",
+    "imageUrl": "/images/forge.jpg",
+    "downloadUrl": "https://maven.minecraftforge.net/net/minecraftforge/forge/1.18.2-40.2.1/forge-1.18.2-40.2.1-installer.jar",
+    "type": "Forge"
+  },
+  {
+    "id": "fabric-1.21.1",
+    "name": "Fabric 1.21.1",
+    "tags": ["Fabric", "1.21.1", "Mods"],
+    "description": "A lightweight, modern modding toolchain.",
+    "systemRequirements": "Java 21+",
+    "hardwareRequirements": "RAM 2GB+",
+    "imageUrl": "/images/fabric.jpg",
+    "downloadUrl": "https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.15.11/0.11.1/server/jar",
+    "type": "Fabric"
+  },
+  {
+    "id": "vanilla-1.21.1",
+    "name": "Vanilla 1.21.1",
+    "tags": ["Vanilla", "1.21.1"],
+    "description": "The original Minecraft server experience.",
+    "systemRequirements": "Java 21+",
+    "hardwareRequirements": "RAM 1GB+",
+    "imageUrl": "/images/vanilla.jpg",
+    "downloadUrl": "https://piston-data.mojang.com/v1/objects/422117b2d593e435196b05f0b0188d14f826b56d/server.jar",
+    "type": "Vanilla"
+  },
+  {
+    "id": "vanilla-1.20.4",
+    "name": "Vanilla 1.20.4",
+    "tags": ["Vanilla", "1.20.4"],
+    "description": "The official server for Minecraft 1.20.4.",
+    "systemRequirements": "Java 17+",
+    "hardwareRequirements": "RAM 1GB+",
+    "imageUrl": "/images/vanilla.jpg",
+    "downloadUrl": "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b5ed26e44a64101c/server.jar",
+    "type": "Vanilla"
+  }
+]

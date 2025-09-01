@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server - System Monitoring</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
+    <link th:href="@{/css/system.css}" rel="stylesheet">
+    <script th:src="@{/js/system.js}" defer></script>
+</head>
+<body>
+<div th:replace="~{fragments/common :: main-navbar(breadcrumbs=${breadcrumbs})}"></div>
+
+<div class="main-container">
+    <div class="page-header">
+        <h1 class="page-title">System Monitoring</h1>
+        <button class="control-btn btn-primary" id="refresh-all">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span>Refresh All</span>
+        </button>
+    </div>
+
+    <div class="alert-section" id="alert-section"></div>
+
+    <div class="cards-grid">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Resource Usage</h3></div>
+            <div class="card-content">
+                <div class="usage-stats">
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-label">CPU Usage</span>
+                            <span class="stat-value" id="cpu-usage-value">...</span>
+                        </div>
+                        <div class="progress-container"><div class="progress-fill" id="cpu-progress"></div></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-label">Memory</span>
+                            <span class="stat-value" id="ram-usage-value">...</span>
+                        </div>
+                        <div class="progress-container"><div class="progress-fill" id="ram-progress"></div></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-label">Disk Space</span>
+                            <span class="stat-value" id="disk-usage-value">...</span>
+                        </div>
+                        <div class="progress-container"><div class="progress-fill" id="disk-progress"></div></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-label">JVM Memory</span>
+                            <span class="stat-value" id="jvm-memory-value">...</span>
+                        </div>
+                        <div class="progress-container"><div class="progress-fill" id="jvm-progress"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">System Information</h3></div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">CPU Cores</span>
+                        <span class="info-value" id="cpu-cores">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Load Average</span>
+                        <span class="info-value" id="load-average">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">System Uptime</span>
+                        <span class="info-value" id="system-uptime">...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">JVM Processors</span>
+                        <span class="info-value" id="jvm-processors">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Service Status</h3></div>
+            <div class="card-content">
+                <div class="service-list">
+                    <div class="service-item">
+                        <span class="service-label">Installed Servers</span>
+                        <span class="service-value" id="total-servers">...</span>
+                    </div>
+                    <div class="service-item">
+                        <span class="service-label">Running Servers</span>
+                        <span class="service-value" id="running-servers">...</span>
+                    </div>
+                    <div class="service-item">
+                        <span class="service-label">Overall Status</span>
+                        <span class="service-value" id="minecraft-status">...</span>
+                    </div>
+                    <div class="service-item">
+                        <span class="service-label">WebSocket Sessions</span>
+                        <span class="service-value" id="websocket-sessions">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="last-updated">
+        Last updated: <span id="last-update-time">Never</span>
+    </div>
+</div>
+</body>
+</html>

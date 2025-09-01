@@ -1,0 +1,122 @@
+server:
+  port: 3443
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: Minecraft Panel
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:file:./data/minecraft-panel-db
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ''
+
+  security:
+    user:
+      name: ahror
+      password: rorha4002
+      roles: ADMIN
+
+  web:
+    resources:
+      static-locations: classpath:/static/
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
+
+  task:
+    execution:
+      pool:
+        core-size: 4
+        max-size: 8
+        queue-capacity: 100
+      thread-name-prefix: minecraft-async-
+    scheduling:
+      pool:
+        size: 2
+      thread-name-prefix: minecraft-scheduler-
+
+logging:
+  level:
+    uz.ahrorjon.minecraftpanel: DEBUG
+    mc.server: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.socket: DEBUG
+    nl.vv32.rcon: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+minecraft:
+  server:
+    path: /home/minecraft/mc-server
+    service-name: minecraft.service
+    max-players: 20
+    log-file: ${minecraft.server.path}/logs/latest.log
+
+    console:
+      max-history: 1000
+
+    rcon:
+      enabled: true
+      host: localhost
+      port: 25575
+      password: rcpahr0
+      timeout: 5000
+      retry-attempts: 3
+      retry-delay: 1000
+    backup:
+      enabled: true
+      path: ${minecraft.server.path}/backups
+      schedule: "0 0 3 * * ?"
+      retention-days: 7
+      compress-backups: true
+
+    # Monitoring configuration
+    monitoring:
+      enabled: true
+      update-interval: 30s
+      tps-check-interval: 30  # seconds
+      player-list-refresh-interval: 10  # seconds
+      auto-restart-on-crash: false
+      health-check-interval: 60  # seconds
+      cpu-samples: 5
+
+  # Security configuration
+  security:
+    session-timeout: 5m
+
+  # Alert configuration
+  alerts:
+    enabled: true
+    tps-threshold: 18.0
+    player-count-threshold: 15
+    memory-threshold: 80.0
+    disk-threshold: 85.0
+    notify-on-player-join: false
+    notify-on-player-leave: false
+    notify-on-server-restart: true
+
+# WebSocket configuration
+websocket:
+  allowed-origins: "*"
+  buffer-size: 8192
+  max-sessions: 50
