@@ -15,6 +15,10 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class ServerStatus {
+    private Long instanceId;
+    private String name;
+    private String serverType;
+    private int port;
     private boolean online;
     private int playersOnline;
     private int maxPlayers;

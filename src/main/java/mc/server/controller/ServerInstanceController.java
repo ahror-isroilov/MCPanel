@@ -1,6 +1,7 @@
 package mc.server.controller;
 
 import lombok.RequiredArgsConstructor;
+import mc.server.dto.ApiResponse;
 import mc.server.model.ServerInstance;
 import mc.server.service.MinecraftServerService;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Map;
 
-import java.util.concurrent.CompletableFuture;
+import mc.server.model.ServerStatus;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/servers")
@@ -19,7 +21,19 @@ public class ServerInstanceController {
 
     private final MinecraftServerService minecraftServerService;
 
+    @GetMapping("/statuses")
+    public ResponseEntity<ApiResponse<List<ServerStatus>>> getAllServerStatuses() {
+        try {
+            List<ServerStatus> statuses = minecraftServerService.getAllServerStatuses();
+            return ResponseEntity.ok(ApiResponse.success(statuses));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Failed to get all server statuses"));
+        }
+    }
+
     @PostMapping
+//...
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServerInstance> createServerInstance(
             @RequestParam String name,

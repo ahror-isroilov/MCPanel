@@ -53,7 +53,7 @@ public class MinecraftServerService {
             boolean isOnline = isServerRunning(instanceId);
 
             if (!isOnline) {
-                return buildOfflineServerStatus(instanceId);
+                return buildOfflineServerStatus(instance);
             }
 
             updatePlayerListFromRcon(instanceId);
@@ -66,6 +66,10 @@ public class MinecraftServerService {
             String uptime = getServerUptime(instanceId);
 
             return ServerStatus.builder()
+                    .instanceId(instance.getId())
+                    .name(instance.getName())
+                    .serverType(instance.getServerType())
+                    .port(instance.getPort())
                     .online(true)
                     .playersOnline(currentPlayerCounts.getOrDefault(instanceId, 0))
                     .maxPlayers(serverProperties.getIntProperty(instanceId, "max-players", 20))
@@ -84,8 +88,42 @@ public class MinecraftServerService {
 
         } catch (Exception e) {
             log.error("Error getting server status for instance {}", instanceId, e);
-            return buildOfflineServerStatus(instanceId);
+            return buildOfflineServerStatus(instance);
         }
+    }
+
+    private ServerStatus buildOfflineServerStatus(ServerInstance instance) {
+        var systemStats = systemMonitoringService.getSystemStats();
+
+        return ServerStatus.builder()
+                .instanceId(instance.getId())
+                .name(instance.getName())
+                .serverType(instance.getServerType())
+                .port(instance.getPort())
+                .online(false)
+                .playersOnline(0)
+                .maxPlayers(serverProperties.getIntProperty(instance.getId(), "max-players", 20))
+                .cpuUsage((Double) systemStats.get("cpuUsage"))
+                .ramUsage((Double) systemStats.get("ramUsage"))
+                .totalRam((Double) systemStats.get("totalRam"))
+                .uptime("Offline")
+                .tps(0.0)
+                .lastUpdated(LocalDateTime.now())
+                .onlinePlayers(new ArrayList<>())
+                .version("Unknown")
+                .worldName("Unknown")
+                .diskUsage((Double) systemStats.get("diskUsage"))
+                .totalDisk((Double) systemStats.get("totalDisk"))
+                .build();
+    }
+
+    public List<ServerStatus> getAllServerStatuses() {
+        List<ServerInstance> instances = serverInstanceRepository.findAll();
+        List<ServerStatus> statuses = new ArrayList<>();
+        for (ServerInstance instance : instances) {
+            statuses.add(getServerStatus(instance.getId()));
+        }
+        return statuses;
     }
 
     private void updatePlayerListFromRcon(Long instanceId) {

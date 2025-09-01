@@ -49,6 +49,8 @@ public class ServerController {
         }
     }
 
+    
+
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDetailedServerInfo(@PathVariable Long instanceId) {
         try {

@@ -19,7 +19,10 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg-main);
+    background: #121212;
+    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%);
+    background-attachment: fixed;
+    background-size: 100% 100%;
     color: var(--text-primary);
     min-height: 100vh;
     line-height: 1.5;
@@ -55,7 +58,7 @@ body {
     font-size: 14px;
     font-weight: 500;
     padding: 8px 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     transition: all 0.2s ease;
     border: none;
     background: none;
@@ -114,7 +117,7 @@ body {
 
 .status-tag, .version-tag {
     padding: 4px 12px;
-    border-radius: 16px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
 }
@@ -174,7 +177,7 @@ body {
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     overflow: hidden;
 }
@@ -187,13 +190,17 @@ body {
     padding: 16px 20px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 14px;
 }
 
 .card-title {
     font-size: 16px;
     font-weight: 600;
+    flex: 1;
+    margin: 0;
 }
 
 .card-content {
@@ -207,7 +214,7 @@ body {
     gap: 6px;
     padding: 8px 16px;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -323,6 +330,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .status-dot {
@@ -416,7 +424,7 @@ body {
     padding: 8px 12px;
     background: var(--bg-main);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     color: var(--text-primary);
     font-size: 14px;
     transition: all 0.2s ease;
@@ -439,7 +447,7 @@ body {
     width: 42px;
     height: 24px;
     background: var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     transition: background 0.3s ease;
 }
@@ -481,7 +489,7 @@ body {
     justify-content: space-between;
     padding: 12px;
     background: var(--bg-main);
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid var(--border-color);
 }
 
@@ -517,7 +525,7 @@ body {
     background: var(--border-color);
     color: var(--text-primary);
     border: none;
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: pointer;
 }
 
@@ -542,7 +550,7 @@ body {
 .modal-content {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
@@ -599,7 +607,7 @@ body {
     align-items: center;
     padding: 10px 14px;
     background: var(--bg-main);
-    border-radius: 8px;
+    border-radius: 10px;
 }
 
 .whitelist-player-info {
@@ -638,7 +646,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: 10px;
     color: var(--text-secondary);
 }
 
@@ -667,7 +675,7 @@ body {
     padding: 16px 20px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     pointer-events: auto;
     transform: translateX(100%);
@@ -763,7 +771,7 @@ body {
 }
 .card.card-scrollable .card-content::-webkit-scrollbar-thumb {
     background-color: var(--border-color);
-    border-radius: 4px;
+    border-radius: 10px;
     border: 2px solid var(--bg-card);
 }
 .card.card-scrollable .card-content::-webkit-scrollbar-thumb:hover {

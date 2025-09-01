@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
+import java.security.Principal;
 @Controller
 @RequiredArgsConstructor
 public class WebController {
@@ -25,7 +25,10 @@ public class WebController {
     }
 
     @GetMapping("/servers")
-    public String servers(Model model) {
+    public String servers(Model model, Principal principal) {
+        if (principal != null) {
+            model.addAttribute("username", principal.getName());
+        }
         model.addAttribute("servers", serverInstanceRepository.findAll());
         model.addAttribute("breadcrumbs", new java.util.LinkedHashMap<String, String>() {{
             put("Servers", null);

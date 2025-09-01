@@ -66,7 +66,7 @@ input[type="text"], input[type="password"] {
     padding: 15px 20px;
     background: #0a0a0a;
     border: 2px solid #333;
-    border-radius: 15px;
+    border-radius: 10px;
     color: #e0e0e0;
     font-family: 'Manrope', sans-serif;
     font-size: 14px;
@@ -90,7 +90,7 @@ input::placeholder {
     background: #2ecc71;
     color: white;
     border: none;
-    border-radius: 15px;
+    border-radius: 10px;
     font-family: 'Manrope', sans-serif;
     font-size: 14px;
     font-weight: 700;

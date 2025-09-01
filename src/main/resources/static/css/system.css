@@ -56,6 +56,10 @@ body {
     gap: 24px;
 }
 
+.nav-right form {
+    margin: 0;
+}
+
 .nav-center {
     flex: 1;
     justify-content: center;
@@ -66,6 +70,11 @@ body {
     align-items: center;
     gap: 8px;
     text-decoration: none;
+}
+
+.brand-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 0 8px rgba(74, 144, 226, 0.3));
 }
 
 .brand-text {
@@ -106,7 +115,6 @@ body {
     font-size: 15px;
 }
 
-/* Logout Icon Button */
 .logout-icon-btn {
     background: none;
     border: none;
@@ -154,7 +162,7 @@ body {
     gap: 8px;
     padding: 10px 18px;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -175,7 +183,7 @@ body {
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     border: 1px solid transparent;
 }
@@ -200,7 +208,7 @@ body {
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     display: flex;

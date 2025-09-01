@@ -1,101 +1,258 @@
+// Notification system
+function showNotification(message, type = 'success') {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    notification.className = `notification alert-${type}`;
+    notification.innerHTML = `<span>${message}</span>`;
+    container.appendChild(notification);
+    setTimeout(() => {
+        notification.classList.add('removing');
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
+
+// Button loading state management
+function setButtonLoading(button, loading) {
+    if (!button) return;
+    button.disabled = loading;
+    if (loading) {
+        button.classList.add('loading');
+        const originalText = button.textContent;
+        button.dataset.originalText = originalText;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    } else {
+        button.classList.remove('loading');
+        const originalText = button.dataset.originalText || 'Action';
+        button.innerHTML = originalText;
+        delete button.dataset.originalText;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    const deleteModal = document.getElementById('delete-modal');
-    const closeDeleteModal = document.getElementById('close-delete-modal');
-    const cancelDelete = document.getElementById('cancel-delete');
-    const confirmDelete = document.getElementById('confirm-delete');
-    const deleteServerName = document.getElementById('delete-server-name');
-    
-    let currentServerId = null;
-    let currentServerName = null;
+    const serverGrid = document.querySelector('.server-grid');
+    const onlineServerCount = document.getElementById('online-server-count');
+    const searchBar = document.getElementById('search-bar');
 
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
-        
-        const notification = document.createElement('div');
-        notification.className = `notification alert-${type}`;
-        notification.innerHTML = `<span>${message}</span>`;
-        container.appendChild(notification);
-        setTimeout(() => {
-            notification.classList.add('removing');
-            setTimeout(() => notification.remove(), 300);
-        }, 4000);
-    }
+    let serverData = [];
 
-    function openDeleteModal(serverId, serverName) {
-        currentServerId = serverId;
-        currentServerName = serverName;
-        deleteServerName.textContent = serverName;
-        deleteModal.style.display = 'flex';
-    }
-
-    function closeDeleteModalHandler() {
-        deleteModal.style.display = 'none';
-        currentServerId = null;
-        currentServerName = null;
-    }
-
-    async function deleteServer(serverId) {
+    const fetchServerData = async () => {
         try {
-            const response = await fetch(`/api/servers/${serverId}`, {
-                method: 'DELETE'
-            });
-
+            const response = await fetch('/api/servers/statuses');
+            if (!response.ok) {
+                throw new Error('Failed to fetch server statuses');
+            }
             const result = await response.json();
-
             if (result.success) {
-                showNotification(`Server "${currentServerName}" deleted successfully`, 'success');
-                closeDeleteModalHandler();
-                // Remove the server card from the UI
-                const serverCard = document.querySelector(`[data-id="${serverId}"]`).closest('.server-card');
-                if (serverCard) {
-                    serverCard.style.animation = 'slideOut 0.3s ease-in-out';
-                    setTimeout(() => {
-                        serverCard.remove();
-                    }, 300);
+                serverData = result.data;
+                renderServerCards();
+            }
+        } catch (error) {
+            console.error('Error fetching server statuses:', error);
+        }
+    };
+
+    const renderServerCards = () => {
+        const searchTerm = searchBar.value.toLowerCase();
+        const filteredData = serverData.filter(server => server.name && server.name.toLowerCase().includes(searchTerm));
+
+        const onlineCount = serverData.filter(s => s.online).length;
+        onlineServerCount.textContent = onlineCount;
+
+        // Get all existing server cards
+        const existingCards = Array.from(serverGrid.querySelectorAll('[data-server-id]'));
+
+        // Hide/show cards based on search filter
+        existingCards.forEach(card => {
+            const serverId = card.dataset.serverId;
+            const server = serverData.find(s => s.instanceId == serverId);
+
+            if (server && filteredData.some(s => s.instanceId == serverId)) {
+                // Update and show the card
+                updateServerCard(card, server);
+                card.style.display = 'block';
+            } else {
+                // Hide the card
+                card.style.display = 'none';
+            }
+        });
+
+        // Create cards for servers that don't have existing cards
+        filteredData.forEach(server => {
+            const existingCard = serverGrid.querySelector(`[data-server-id="${server.instanceId}"]`);
+            if (!existingCard) {
+                const newCard = createServerCard(server);
+                // Insert before the "Add New Server" card
+                const addServerCard = serverGrid.querySelector('.add-server-card');
+                if (addServerCard) {
+                    serverGrid.insertBefore(newCard, addServerCard);
+                } else {
+                    serverGrid.appendChild(newCard);
                 }
+            }
+        });
+    };
+
+    const updateServerCard = (card, server) => {
+        const onlineStatus = server.online ? 'online' : 'offline';
+        card.querySelector('.status-indicator').className = `status-indicator ${onlineStatus}`;
+        card.querySelector('.status-text').textContent = onlineStatus;
+        
+        const startBtn = card.querySelector('.start-btn');
+        const stopBtn = card.querySelector('.stop-btn');
+        
+        // Only update visibility if buttons are not in loading state
+        if (!startBtn.classList.contains('loading')) {
+            startBtn.style.display = server.online ? 'none' : 'inline-flex';
+        }
+        if (!stopBtn.classList.contains('loading')) {
+            stopBtn.style.display = server.online ? 'inline-flex' : 'none';
+        }
+    };
+
+    const createServerCard = (server) => {
+        const card = document.createElement('div');
+        card.className = 'server-card';
+        card.dataset.serverId = server.instanceId;
+
+        const onlineStatus = server.online ? 'online' : 'offline';
+        const startBtnDisplay = server.online ? 'none' : 'inline-flex';
+        const stopBtnDisplay = server.online ? 'inline-flex' : 'none';
+
+        // Handle version and serverType with fallbacks
+        const version = server.version || 'Unknown';
+        const serverType = server.serverType || 'Paper';
+
+        card.innerHTML = `
+        <div class="server-card-content">
+        <div class="card-header">
+            <div class="header-top">
+                <div class="status-indicator ${onlineStatus}"></div>
+                <div class="header-content">
+                    <a href="/servers/${server.instanceId}/server" class="server-name">${server.name}</a>
+                </div>
+                <div class="card-actions">
+                    <button class="start-btn" style="display: ${startBtnDisplay};">Start</button>
+                    <button class="stop-btn" style="display: ${stopBtnDisplay};">Stop</button>
+                    <button class="delete-btn" title="Delete server">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"></polyline>
+                            <path d="m19,6v14a2,2 0,0 1,-2,2H7a2,2 0,0 1,-2,-2V6m3,0V4a2,2 0,0 1,2,-2h4a2,2 0,0 1,2,2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="server-tags">
+                ${version !== 'Unknown' ? `<span class="version-tag">${version}</span>` : ''}
+                ${serverType !== 'Unknown' ? `<span class="server-type-tag">${serverType}</span>` : ''}
+            </div>
+        </div>
+            <div class="card-body">
+                <div class="server-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value status-text">${onlineStatus}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Server Port:</span>
+                        <span class="detail-value">${server.port}</span>
+                    </div>
+                    ${server.rconEnabled ? `
+                    <div class="detail-item">
+                        <span class="detail-label">RCON Port:</span>
+                        <span class="detail-value">${server.rconPort}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+        return card;
+    };
+
+    const handleServerAction = async (instanceId, action, button) => {
+        setButtonLoading(button, true);
+        
+        try {
+            const response = await fetch(`/api/servers/${instanceId}/${action}`, {method: 'POST'});
+            const result = await response.json();
+            if (result.success) {
+                showNotification(`Server ${action} command issued successfully.`, 'success');
+                // Refresh server data after a delay and re-enable button
+                setTimeout(() => {
+                    fetchServerData();
+                    setButtonLoading(button, false);
+                }, 3000);
+            } else {
+                showNotification(`Failed to ${action} server: ${result.error}`, 'error');
+                setButtonLoading(button, false);
+            }
+        } catch (error) {
+            console.error(`Error during ${action}:`, error);
+            showNotification(`Error during ${action}: ${error.message}`, 'error');
+            setButtonLoading(button, false);
+        }
+    };
+
+    serverGrid.addEventListener('click', (event) => {
+        const target = event.target.closest('button');
+        if (target) {
+            const card = target.closest('.server-card');
+            const instanceId = card.dataset.serverId;
+            if (target.classList.contains('start-btn')) {
+                handleServerAction(instanceId, 'start', target);
+            } else if (target.classList.contains('stop-btn')) {
+                handleServerAction(instanceId, 'stop', target);
+            } else if (target.classList.contains('delete-btn')) {
+                const deleteModal = document.getElementById('delete-modal');
+                const deleteServerName = document.getElementById('delete-server-name');
+                const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+                const server = serverData.find(s => s.instanceId == instanceId);
+                if (server) {
+                    deleteServerName.textContent = server.name;
+                    confirmDeleteBtn.dataset.instanceId = instanceId;
+                    deleteModal.style.display = 'flex';
+                }
+            }
+        }
+    });
+
+    searchBar.addEventListener('input', renderServerCards);
+
+    // Modal listeners
+    const deleteModal = document.getElementById('delete-modal');
+    const closeDeleteModalBtn = document.getElementById('close-delete-modal');
+    const cancelDeleteBtn = document.getElementById('cancel-delete');
+    const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+    closeDeleteModalBtn.addEventListener('click', () => deleteModal.style.display = 'none');
+    cancelDeleteBtn.addEventListener('click', () => deleteModal.style.display = 'none');
+
+    confirmDeleteBtn.addEventListener('click', async (event) => {
+        const instanceId = event.target.dataset.instanceId;
+        const originalText = confirmDeleteBtn.textContent;
+        
+        try {
+            setButtonLoading(confirmDeleteBtn, true);
+            const response = await fetch(`/api/servers/${instanceId}`, {method: 'DELETE'});
+            const result = await response.json();
+            if (result.success) {
+                showNotification('Server deleted successfully.', 'success');
+                deleteModal.style.display = 'none';
+                fetchServerData();
             } else {
                 showNotification(`Failed to delete server: ${result.error}`, 'error');
             }
         } catch (error) {
             console.error('Error deleting server:', error);
-            showNotification('Error deleting server. Please try again.', 'error');
-        }
-    }
-
-    // Event listeners for delete buttons
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('.delete-btn')) {
-            const deleteBtn = e.target.closest('.delete-btn');
-            const serverId = deleteBtn.getAttribute('data-id');
-            const serverName = deleteBtn.getAttribute('data-name');
-            openDeleteModal(serverId, serverName);
-            e.preventDefault();
-            e.stopPropagation();
+            showNotification(`Error deleting server: ${error.message}`, 'error');
+        } finally {
+            setButtonLoading(confirmDeleteBtn, false);
         }
     });
 
-    // Modal event listeners
-    closeDeleteModal.addEventListener('click', closeDeleteModalHandler);
-    cancelDelete.addEventListener('click', closeDeleteModalHandler);
-    
-    confirmDelete.addEventListener('click', () => {
-        if (currentServerId) {
-            deleteServer(currentServerId);
-        }
-    });
-
-    // Close modal when clicking outside
-    deleteModal.addEventListener('click', (e) => {
-        if (e.target === deleteModal) {
-            closeDeleteModalHandler();
-        }
-    });
-
-    // Escape key to close modal
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && deleteModal.style.display === 'flex') {
-            closeDeleteModalHandler();
-        }
-    });
+    fetchServerData();
+    setInterval(fetchServerData, 5000);
 });

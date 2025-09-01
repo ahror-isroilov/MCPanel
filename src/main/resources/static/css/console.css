@@ -31,8 +31,13 @@
 /* General Styles */
 body {
     font-family: 'Inter', sans-serif;
-    background: var(--bg-main);
+    background: #121212;
+    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%);
+    background-attachment: fixed;
+    background-size: 100% 100%;
     color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
     margin: 0;
 }
 
@@ -69,7 +74,7 @@ body {
 
 .status-tag, .version-tag {
     padding: 4px 12px;
-    border-radius: 16px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
 }
@@ -106,7 +111,7 @@ body {
     gap: 6px;
     padding: 8px 16px;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -185,13 +190,14 @@ body {
 }
 
 .console-wrapper {
-    background: var(--bg-console);
+    background: var(--bg-main);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     height: 70vh;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .status-bar {
@@ -235,6 +241,8 @@ body {
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.6;
+    background: #0a0a0a;
+    background-image: none;
 }
 
 .console-input-container {

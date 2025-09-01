@@ -43,7 +43,10 @@ const SystemMonitor = {
     },
 
     addEventListeners() {
-        document.getElementById('refresh-all').addEventListener('click', () => this.loadInitialStats());
+        const refreshBtn = document.getElementById('refresh-all');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadInitialStats());
+        }
         window.addEventListener('beforeunload', () => this.cleanup());
     },
 
