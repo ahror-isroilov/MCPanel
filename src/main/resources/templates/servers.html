@@ -26,7 +26,6 @@
             </div>
         </div>
 
-        <!-- Server Grid - Display if servers exist -->
         <div class="server-grid" th:if="${!#lists.isEmpty(servers)}">
             <div class="server-card add-server-card">
                 <a href="/servers/create">
@@ -38,7 +37,6 @@
             </div>
         </div>
 
-        <!-- Empty State - Display if no servers exist -->
         <div class="empty-state" th:if="${#lists.isEmpty(servers)}">
             <div class="empty-state-icon">
                 <i class="fas fa-server"></i>

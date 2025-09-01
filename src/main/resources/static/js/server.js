@@ -44,7 +44,6 @@ async function executeServerAction(action, button) {
         const result = await response.json();
         if (result.success) {
             showNotification(`Server ${action} command issued.`, 'success');
-            // Status will be updated via WebSocket, but we can poll as a fallback
             setTimeout(loadServerStatus, 2000);
         } else {
             showNotification(`Failed to ${action} server: ${result.error}`, 'error');
@@ -183,7 +182,6 @@ function renderPropertiesEditor() {
             `;
         }
 
-        // Add edit button for whitelist when enabled
         if (key === 'white-list' && currentValue.toLowerCase() === 'true') {
             inputHtml += `
                 <button class="action-btn btn-secondary compact" id="edit-whitelist-btn" style="margin-left: 8px;">
@@ -216,7 +214,6 @@ function renderPropertiesEditor() {
 }
 
 function attachPropertyEventListeners() {
-    // Text/number inputs
     document.querySelectorAll('.property-input').forEach(input => {
         input.addEventListener('blur', async (e) => {
             await updateProperty(e.target.dataset.property, e.target.value);
@@ -228,14 +225,12 @@ function attachPropertyEventListeners() {
         });
     });
 
-    // Select dropdowns
     document.querySelectorAll('.property-select-enhanced').forEach(select => {
         select.addEventListener('change', async (e) => {
             await updateProperty(e.target.dataset.property, e.target.value);
         });
     });
 
-    // Toggle switches
     document.querySelectorAll('.toggle-switch').forEach(toggle => {
         toggle.addEventListener('click', async (e) => {
             const isActive = toggle.classList.contains('active');
@@ -244,7 +239,6 @@ function attachPropertyEventListeners() {
         });
     });
 
-    // Whitelist edit button
     const editWhitelistBtn = document.getElementById('edit-whitelist-btn');
     if (editWhitelistBtn) {
         editWhitelistBtn.addEventListener('click', openWhitelistModal);
@@ -266,7 +260,6 @@ async function updateProperty(propertyKey, value) {
         if (result.success) {
             serverProperties[propertyKey] = value;
             
-            // Update UI for boolean toggles
             if (propertyValidations[propertyKey]?.type === 'boolean') {
                 const toggle = document.querySelector(`[data-property="${propertyKey}"]`);
                 if (toggle) {
@@ -280,19 +273,16 @@ async function updateProperty(propertyKey, value) {
                 `${propertyKey} updated successfully`;
             showNotification(message, 'success');
             
-            // Re-render properties if whitelist was toggled (to show/hide edit button)
             if (propertyKey === 'white-list') {
                 renderPropertiesEditor();
             }
         } else {
             showNotification(`Failed to update ${propertyKey}: ${result.error}`, 'error');
-            // Revert UI changes
             loadServerProperties();
         }
     } catch (error) {
         console.error('Error updating property:', error);
         showNotification(`Error updating ${propertyKey}`, 'error');
-        // Revert UI changes
         loadServerProperties();
     }
 }
@@ -309,7 +299,6 @@ async function refreshPlayerList() {
     }
 }
 
-// Whitelist Modal Functions
 async function openWhitelistModal() {
     const modal = document.getElementById('whitelist-modal');
     if (modal) {
@@ -322,7 +311,6 @@ function closeWhitelistModal() {
     const modal = document.getElementById('whitelist-modal');
     if (modal) {
         modal.style.display = 'none';
-        // Clear the input
         const input = document.getElementById('whitelist-player-input');
         if (input) input.value = '';
     }
@@ -373,7 +361,6 @@ function renderWhitelistInModal(whitelistEntries) {
         </div>
     `).join('');
     
-    // Attach remove button listeners
     container.querySelectorAll('.whitelist-remove-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             await removeFromWhitelist(btn.dataset.player);
@@ -401,7 +388,6 @@ async function addToWhitelist(playerName) {
         if (result.success) {
             showNotification(`${playerName} added to whitelist`, 'success');
             await loadWhitelistInModal();
-            // Clear input
             const input = document.getElementById('whitelist-player-input');
             if (input) input.value = '';
         } else {
@@ -463,7 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
         backupBtn.addEventListener('click', () => executeServerAction('backup', backupBtn));
     }
 
-    // Whitelist modal event listeners
     const closeWhitelistModalBtn = document.getElementById('close-whitelist-modal');
     if (closeWhitelistModalBtn) {
         closeWhitelistModalBtn.addEventListener('click', closeWhitelistModal);
@@ -484,7 +469,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Close modal when clicking outside
     const whitelistModal = document.getElementById('whitelist-modal');
     if (whitelistModal) {
         whitelistModal.addEventListener('click', (e) => {
@@ -494,10 +478,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initial load
     loadServerStatus();
     loadServerProperties();
 
-    // Periodic refresh
     setInterval(loadServerStatus, 10000);
 });

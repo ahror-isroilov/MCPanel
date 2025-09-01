@@ -66,7 +66,6 @@ public class ScheduledTasksService {
                     } else {
                         systemStats.put("rconConnected", false);
                     }
-                    // webSocketService.broadcastSystemStats(instance.getId(), systemStats);
                 }
             }
         } catch (Exception e) {
@@ -149,8 +148,6 @@ public class ScheduledTasksService {
 
             if (highCpu || highMemory || highDisk) {
                 String alertMessage = buildResourceAlert(highCpu, highMemory, highDisk);
-//                log.warn(alertMessage);
-
                 for (ServerInstance instance : serverInstanceRepository.findAll()) {
                     if (webSocketService.hasActiveSessions()) {
                         webSocketService.broadcastConsoleMessage(instance.getId(),

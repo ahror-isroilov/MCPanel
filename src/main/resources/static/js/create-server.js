@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 pageTitle.textContent = titles[currentTitleIndex];
                 pageTitle.classList.remove('fade-out');
-            }, 500); // Corresponds to the CSS transition duration
+            }, 500);
 
-        }, 4000); // Change title every 4 seconds
+        }, 4000);
     }
 
     const modal = document.getElementById('install-modal');

@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             button.classList.remove('loading');
-            // Restore original icon
             const action = button.id.split('-')[0];
             const icon = button.querySelector('i, svg');
             if (icon && icon.tagName === 'I') {
@@ -59,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (action === 'restart') icon.className = 'fas fa-sync-alt';
                 if (action === 'stop') icon.className = 'fas fa-stop';
             } else if (icon && icon.tagName === 'SVG') {
-                // Restore original SVG icons
                 if (action === 'start') {
                     icon.innerHTML = '<polygon points="5,3 19,12 5,21" fill="currentColor"/>';
                 } else if (action === 'restart') {
@@ -142,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
         serverStatusTag.classList.toggle('status-running', isOnline);
         serverStatusTag.classList.toggle('status-stopped', !isOnline);
 
-        // Reset all button loading states when status updates
         setButtonLoading(startServerBtn, false);
         setButtonLoading(restartServerBtn, false);  
         setButtonLoading(stopServerBtn, false);
@@ -159,9 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (result.success) {
                 showNotification(`Server ${action} command issued.`, 'success');
-                // Status will be updated via WebSocket, but we can poll as a fallback
                 setTimeout(() => {
-                    // Check if button is still in loading state and reset if needed
                     if (button.classList.contains('loading')) {
                         setButtonLoading(button, false);
                     }
@@ -191,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (historyIndex > 0) {
                 historyIndex--;
                 commandInput.value = commandHistory[historyIndex];
-                e.preventDefault(); // Prevents cursor from moving to the start
+                e.preventDefault();
             }
         } else if (e.key === 'ArrowDown') {
             if (historyIndex < commandHistory.length - 1) {

@@ -17,11 +17,9 @@ public class PortManagerService {
     
     private final ServerInstanceRepository serverInstanceRepository;
     
-    // Port range for Minecraft servers
     private static final int MIN_PORT = 25565;
     private static final int MAX_PORT = 25665;
     
-    // RCON port range
     private static final int MIN_RCON_PORT = 25700;
     private static final int MAX_RCON_PORT = 25800;
     
@@ -34,7 +32,6 @@ public class PortManagerService {
     }
     
     private int findAvailablePortInRange(int minPort, int maxPort) {
-        // Get all currently allocated ports from database
         Set<Integer> usedPorts = new HashSet<>(serverInstanceRepository.findAllAllocatedPorts());
         Set<Integer> usedRconPorts = new HashSet<>(serverInstanceRepository.findAllAllocatedRconPorts());
         

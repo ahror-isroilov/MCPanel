@@ -52,7 +52,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<!-- This file is a library of fragments. Nothing in this file is rendered directly. -->
 
 <head>
     <!-- Common head content: meta tags, fonts, global CSS -->
@@ -69,43 +68,6 @@
 </head>
 
 <body>
-
-<!--&lt;!&ndash; Main navigation bar &ndash;&gt;-->
-<!--<nav class="navbar" th:fragment="main-navbar(breadcrumbs)">-->
-<!--    <div class="nav-container">-->
-<!--        <div class="nav-left">-->
-<!--            <a href="/servers" class="nav-brand">-->
-<!--                <span class="brand-text">MCPanel</span>-->
-<!--            </a>-->
-<!--            <div class="breadcrumb-nav">-->
-<!--                <th:block th:each="crumb, iterStat : ${breadcrumbs}">-->
-<!--                    <a class="breadcrumb-item" th:href="${crumb.value}" th:text="${crumb.key}" th:classappend="${crumb.value == null} ? 'active'"></a>-->
-<!--                    <span class="breadcrumb-separator" th:if="${!iterStat.last}">/</span>-->
-<!--                </th:block>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="nav-right">-->
-<!--            <a href="/system" class="logout-icon-btn" title="System">-->
-<!--                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">-->
-<!--                    <circle cx="12" cy="12" r="10"></circle>-->
-<!--                    <line x1="12" y1="16" x2="12" y2="12"></line>-->
-<!--                    <line x1="12" y1="8" x2="12.01" y2="8"></line>-->
-<!--                </svg>-->
-<!--            </a>-->
-<!--            <form method="post" th:action="@{/logout}">-->
-<!--                <button class="logout-icon-btn" type="submit" title="Logout">-->
-<!--                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">-->
-<!--                        <path d="M9,21H5a2,2 0,0 1,-2,-2V5A2,2 0,0 1,5,3H9"></path>-->
-<!--                        <polyline points="16,17 21,12 16,7"></polyline>-->
-<!--                        <line x1="21" y1="12" x2="9" y2="12"></line>-->
-<!--                    </svg>-->
-<!--                </button>-->
-<!--            </form>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</nav>-->
-
-<!-- Server-specific navigation bar -->
 <nav class="navbar" th:fragment="server-navbar(instanceId, serverName, activePage)">
     <div class="nav-container">
         <div class="nav-left">

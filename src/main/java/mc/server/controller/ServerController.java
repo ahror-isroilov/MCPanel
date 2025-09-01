@@ -36,7 +36,6 @@ import java.util.concurrent.CompletableFuture;
 public class ServerController {
     private final ServerPropertiesService serverPropertiesService;
     private final MinecraftServerService minecraftServerService;
-    private final SystemMonitoringService systemMonitoringService;
     private final WebSocketService webSocketService;
     private final LogMonitoringService logMonitoringService;
     private final RconService rconService;

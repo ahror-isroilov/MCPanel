@@ -75,7 +75,7 @@ public class WebController {
                 put("System", null);
             }});
         } catch (Exception e) {
-            // Handle error gracefully
+            // Handle error
         }
         return "system";
     }

@@ -5,12 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import mc.server.model.InstallationStatus;
 import mc.server.model.ServerInstance;
 import mc.server.model.ServerStatus;
-import mc.server.model.ConsoleMessage;
 import mc.server.repository.ServerInstanceRepository;
 import mc.server.service.RconService;
 import mc.server.service.SystemMonitoringService;
 import mc.server.service.TemplateService;
-import mc.server.service.WebSocketService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
-import java.util.Comparator;
 
 import static mc.server.service.LogPatterns.*;
 
@@ -39,7 +36,6 @@ public class MinecraftServerService {
     private final SystemMonitoringService systemMonitoringService;
     private final RconService rconService;
     private final ServerPropertiesService serverProperties;
-    private final ServerDownloaderService serverDownloaderService;
     private final TemplateService templateService;
     private final ApplicationContext applicationContext;
 
@@ -445,16 +441,16 @@ public class MinecraftServerService {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 String javaCommand = (javaExecutable != null) ? javaExecutable.toString() : "java";
-                
+
                 ProcessBuilder processBuilder = new ProcessBuilder(
-                    javaCommand,
-                    "-Xms" + memory,
-                    "-Xmx" + memory,
-                    "-jar",
-                    instance.getJarFileName(),
-                    "nogui"
+                        javaCommand,
+                        "-Xms" + memory,
+                        "-Xmx" + memory,
+                        "-jar",
+                        instance.getJarFileName(),
+                        "nogui"
                 );
-                
+
                 processBuilder.directory(Paths.get(instance.getInstancePath()).toFile());
                 Process process = processBuilder.start();
                 instance.setPid((int) process.pid());
@@ -513,7 +509,7 @@ public class MinecraftServerService {
     @Async
     public CompletableFuture<Boolean> restartServer(Long instanceId) {
         log.info("Restarting Minecraft server instance {}...", instanceId);
-        
+
         ServerInstance instance = getInstance(instanceId);
         var template = templateService.getTemplateById(instance.getServerType());
 
@@ -521,8 +517,8 @@ public class MinecraftServerService {
             if (stopped) {
                 try {
                     Path javaExecutable = applicationContext.getBean(mc.server.service.CrossPlatformJavaService.class)
-                        .ensureJavaAvailable(instanceId, template.systemRequirements());
-                    
+                            .ensureJavaAvailable(instanceId, template.systemRequirements());
+
                     return startServer(instanceId, javaExecutable, instance.getAllocatedMemory());
                 } catch (Exception e) {
                     log.error("Failed to get Java executable for restart", e);
@@ -534,7 +530,6 @@ public class MinecraftServerService {
         });
     }
 
-    
 
     public boolean isServerRunning(Long instanceId) {
         ServerInstance instance = getInstance(instanceId);
@@ -719,10 +714,10 @@ public class MinecraftServerService {
 
     public void deleteServerInstance(Long instanceId) throws IOException {
         log.info("Deleting server instance with ID: {}", instanceId);
-        
+
         ServerInstance instance = serverInstanceRepository.findById(instanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Server instance not found"));
-        
+
         if (isServerRunning(instanceId)) {
             log.info("Stopping server {} before deletion", instance.getName());
             stopServer(instanceId);
@@ -733,7 +728,7 @@ public class MinecraftServerService {
                 Thread.currentThread().interrupt();
             }
         }
-        
+
         serverStartTimes.remove(instanceId);
         onlinePlayers.remove(instanceId);
         currentPlayerCounts.remove(instanceId);
@@ -741,7 +736,7 @@ public class MinecraftServerService {
         worldSeeds.remove(instanceId);
         lastKnownTps.remove(instanceId);
         tpsDebugActive.remove(instanceId);
-        
+
         Path serverPath = Paths.get(instance.getInstancePath());
         if (Files.exists(serverPath)) {
             log.info("Deleting server files at: {}", serverPath);
@@ -749,10 +744,10 @@ public class MinecraftServerService {
         }
 
         serverInstanceRepository.deleteById(instanceId);
-        
+
         log.info("Successfully deleted server instance: {}", instance.getName());
     }
-    
+
     private void deleteDirectoryRecursively(Path path) throws IOException {
         if (Files.isDirectory(path)) {
             try (var stream = Files.walk(path)) {

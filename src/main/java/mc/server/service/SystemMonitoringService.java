@@ -23,12 +23,9 @@ import java.util.regex.Pattern;
 @Slf4j
 @Service
 public class SystemMonitoringService {
-
     private final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-
     public Map<String, Object> getSystemStats() {
         Map<String, Object> stats = new HashMap<>();
-
         try {
             double cpuUsage = getCpuUsage();
             stats.put("cpuUsage", Math.round(cpuUsage * 100.0) / 100.0);
@@ -135,7 +132,6 @@ public class SystemMonitoringService {
         }
         return 0.0;
     }
-
 
     private double getCpuUsage() {
         try {

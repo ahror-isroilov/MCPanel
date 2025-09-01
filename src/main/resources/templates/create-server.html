@@ -34,7 +34,6 @@
         </div>
 
         <div class="template-grid">
-            <!-- Template Card -->
             <div class="template-card" th:each="template : ${templates}" th:data-template-id="${template.id}" th:data-template-name="${template.name}" th:data-type="${template.type}">
                 <img th:src="@{${template.imageUrl}}" alt="Template Image" class="card-image-top">
                 <div class="card-body">
@@ -56,7 +55,6 @@
     </div>
 </div>
 
-<!-- Installation Modal -->
 <div id="install-modal" class="modal" style="display:none;">
     <div class="modal-content">
         <span class="close-button">&times;</span>

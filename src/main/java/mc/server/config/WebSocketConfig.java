@@ -1,6 +1,8 @@
 package mc.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -28,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 @EnableWebSocket
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
-
     private final WebSocketService webSocketService;
     private final SystemMonitoringService systemMonitoringService;
 
@@ -79,14 +81,14 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private class MinecraftConsoleWebSocketHandler extends TextWebSocketHandler {
 
         @Override
-        public void afterConnectionEstablished(WebSocketSession session) {
+        public void afterConnectionEstablished(@Nullable WebSocketSession session) {
             Long instanceId = getInstanceId(session);
             if (instanceId != null) {
-                session.getAttributes().put("instanceId", instanceId);
+                Objects.requireNonNull(session).getAttributes().put("instanceId", instanceId);
                 log.info("WebSocket connection established for instance {}: {}", instanceId, session.getId());
                 webSocketService.addSession(instanceId, session);
             } else {
-                log.error("Could not determine instanceId from WebSocket session URI: {}", session.getUri());
+                log.error("Could not determine instanceId from WebSocket session URI: {}", Objects.requireNonNull(session).getUri());
             }
         }
 
@@ -100,27 +102,27 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
 
         @Override
-        protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        protected void handleTextMessage(WebSocketSession session, @Nullable TextMessage message) {
             Long instanceId = (Long) session.getAttributes().get("instanceId");
             if (instanceId != null) {
-                String payload = message.getPayload();
+                String payload = Objects.requireNonNull(message).getPayload();
                 log.debug("Received WebSocket message from {} for instance {}: {}", session.getId(), instanceId, payload);
                 webSocketService.handleIncomingMessage(instanceId, session, payload);
             }
         }
 
         @Override
-        public void handleTransportError(WebSocketSession session, Throwable exception) {
+        public void handleTransportError(WebSocketSession session, @Nullable Throwable exception) {
             Long instanceId = (Long) session.getAttributes().get("instanceId");
             if (instanceId != null) {
-                log.error("WebSocket transport error for session {} for instance {}: {}", session.getId(), instanceId, exception.getMessage());
+                log.error("WebSocket transport error for session {} for instance {}: {}", session.getId(), instanceId, Objects.requireNonNull(exception).getMessage());
                 webSocketService.removeSession(instanceId, session);
             }
         }
 
         private Long getInstanceId(WebSocketSession session) {
             try {
-                String path = session.getUri().getPath();
+                String path = Objects.requireNonNull(session.getUri()).getPath();
                 String[] segments = path.split("/");
                 return Long.parseLong(segments[segments.length - 1]);
             } catch (Exception e) {
@@ -140,10 +142,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
             log.info("System monitoring WebSocket connection established: {}", session.getId());
             systemSessions.add(session);
             
-            // Start sending periodic system stats updates
-            scheduler.scheduleAtFixedRate(() -> {
-                sendSystemStatsToAllSessions();
-            }, 0, 5, TimeUnit.SECONDS);
+            scheduler.scheduleAtFixedRate(this::sendSystemStatsToAllSessions, 0, 5, TimeUnit.SECONDS);
         }
         
         private void sendSystemStatsToAllSessions() {
@@ -164,17 +163,16 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 String jsonData = objectMapper.writeValueAsString(allStats);
                 TextMessage message = new TextMessage(jsonData);
                 
-                // Send to all active sessions
                 systemSessions.removeIf(session -> {
                     if (!session.isOpen()) {
-                        return true; // Remove closed sessions
+                        return true;
                     }
                     try {
                         session.sendMessage(message);
                         return false;
                     } catch (Exception e) {
                         log.error("Error sending system stats to WebSocket session {}: {}", session.getId(), e.getMessage());
-                        return true; // Remove problematic sessions
+                        return true;
                     }
                 });
                 

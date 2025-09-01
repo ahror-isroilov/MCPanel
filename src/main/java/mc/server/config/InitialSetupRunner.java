@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class InitialSetupRunner implements ApplicationRunner {
-
     private final UserRepository userRepository;
     @Setter
     @Getter

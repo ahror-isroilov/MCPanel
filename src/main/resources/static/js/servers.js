@@ -1,4 +1,3 @@
-// Notification system
 function showNotification(message, type = 'success') {
     const container = document.getElementById('notification-container');
     const notification = document.createElement('div');
@@ -11,7 +10,6 @@ function showNotification(message, type = 'success') {
     }, 4000);
 }
 
-// Button loading state management
 function setButtonLoading(button, loading) {
     if (!button) return;
     button.disabled = loading;
@@ -61,22 +59,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get all existing server cards
         const existingCards = Array.from(serverGrid.querySelectorAll('[data-server-id]'));
 
-        // Hide/show cards based on search filter
         existingCards.forEach(card => {
             const serverId = card.dataset.serverId;
             const server = serverData.find(s => s.instanceId == serverId);
 
             if (server && filteredData.some(s => s.instanceId == serverId)) {
-                // Update and show the card
                 updateServerCard(card, server);
                 card.style.display = 'block';
             } else {
-                // Hide the card
                 card.style.display = 'none';
             }
         });
 
-        // Create cards for servers that don't have existing cards
         filteredData.forEach(server => {
             const existingCard = serverGrid.querySelector(`[data-server-id="${server.instanceId}"]`);
             if (!existingCard) {
@@ -100,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const startBtn = card.querySelector('.start-btn');
         const stopBtn = card.querySelector('.stop-btn');
         
-        // Only update visibility if buttons are not in loading state
         if (!startBtn.classList.contains('loading')) {
             startBtn.style.display = server.online ? 'none' : 'inline-flex';
         }
@@ -136,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const startBtnDisplay = server.online ? 'none' : 'inline-flex';
         const stopBtnDisplay = server.online ? 'inline-flex' : 'none';
 
-        // Handle version and serverType with fallbacks
         const version = server.version || 'Unknown';
         const serverType = server.serverType || 'Paper';
 
@@ -241,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchBar.addEventListener('input', renderServerCards);
 
-    // Modal listeners
     const deleteModal = document.getElementById('delete-modal');
     const closeDeleteModalBtn = document.getElementById('close-delete-modal');
     const cancelDeleteBtn = document.getElementById('cancel-delete');
@@ -252,8 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     confirmDeleteBtn.addEventListener('click', async (event) => {
         const instanceId = event.target.dataset.instanceId;
-        const originalText = confirmDeleteBtn.textContent;
-        
         try {
             setButtonLoading(confirmDeleteBtn, true);
             const response = await fetch(`/api/servers/${instanceId}`, {method: 'DELETE'});

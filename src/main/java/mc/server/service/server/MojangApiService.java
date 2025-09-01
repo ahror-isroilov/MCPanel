@@ -3,6 +3,7 @@ package mc.server.service.server;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -12,6 +13,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MojangApiService {
@@ -38,7 +40,7 @@ public class MojangApiService {
                 }
             }
         } catch (Exception e) {
-            // Log error or handle it as needed
+            log.error("Unable to get player uuid from Mojang", e);
         }
         return Optional.empty();
     }

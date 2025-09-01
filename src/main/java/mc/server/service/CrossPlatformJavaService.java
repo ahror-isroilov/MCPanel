@@ -329,7 +329,6 @@ public class CrossPlatformJavaService {
                 }
             }
         }
-        
         return 17;
     }
     

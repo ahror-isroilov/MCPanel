@@ -148,13 +148,13 @@ public class ServerPropertiesService {
 
                 if (whitelist.stream().noneMatch(entry -> entry.getName().equalsIgnoreCase(playerName))) {
                     String uuid = mojangApiService.getPlayerUuid(playerName)
-                            .orElse("00000000-0000-0000-0000-000000000000"); // Fallback UUID
+                            .orElse("00000000-0000-0000-0000-000000000000");
                     
                     whitelist.add(new WhitelistEntry(playerName, uuid));
                     objectMapper.writerWithDefaultPrettyPrinter().writeValue(whitelistFile.toFile(), whitelist);
                     return true;
                 }
-                return false; // Player already in whitelist
+                return false;
             } catch (IOException e) {
                 log.error("Error adding player to whitelist file for instance {}", instanceId, e);
                 return false;

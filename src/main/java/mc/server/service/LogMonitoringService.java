@@ -192,7 +192,6 @@ public class LogMonitoringService {
         if (infoMatcher.find()) {
             String message = infoMatcher.group(1);
 
-            // Player events
             if (PLAYER_JOIN_PATTERN.matcher(message).find()) {
                 return ConsoleMessage.builder()
                         .type("player_join")

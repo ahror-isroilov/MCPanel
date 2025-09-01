@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class ServerInstallationService {
-    
     private final ServerInstanceRepository serverInstanceRepository;
     private final ServerDownloaderService serverDownloaderService;
     private final TemplateService templateService;
@@ -168,23 +167,17 @@ public class ServerInstallationService {
         
         try {
             Process process = processBuilder.start();
-            boolean serverFullyLoaded = false;
-            
-            // Monitor output and look for server completion signals
             Thread outputThread = new Thread(() -> {
                 try (var reader = process.inputReader()) {
                     reader.lines().forEach(line -> {
-                        webSocketService.broadcastConsoleMessage(instance.getId(), 
+                        webSocketService.broadcastConsoleMessage(instance.getId(),
                             ConsoleMessage.info("[Server Init] " + line));
                         log.debug("Server init output: {}", line);
-                        
-                        // Look for signs that the server has completed loading
+
                         if (line.contains("Done (") && line.contains("s)! For help, type \"help\"")) {
                             log.info("Server finished loading for instance: {}", instance.getName());
-                            
-                            // Send stop command to gracefully shut down server
                             try {
-                                webSocketService.broadcastConsoleMessage(instance.getId(), 
+                                webSocketService.broadcastConsoleMessage(instance.getId(),
                                     ConsoleMessage.info("Server loaded successfully, shutting down..."));
                                 process.outputWriter().write("stop\n");
                                 process.outputWriter().flush();
@@ -198,12 +191,10 @@ public class ServerInstallationService {
                 }
             });
             outputThread.start();
-            
-            // Give the server time to start up and generate files
-            webSocketService.broadcastConsoleMessage(instance.getId(), 
+
+            webSocketService.broadcastConsoleMessage(instance.getId(),
                 ConsoleMessage.info("Waiting for server to initialize and generate files..."));
             
-            // Wait for the server to generate files and shut down gracefully
             boolean processFinished = process.waitFor(180, TimeUnit.SECONDS); // 3 minute timeout
             
             if (!processFinished) {
@@ -213,13 +204,10 @@ public class ServerInstallationService {
                 process.waitFor(10, TimeUnit.SECONDS); // Wait a bit for cleanup
             }
             
-            // Wait for output thread to finish
             outputThread.join(5000);
             
-            // Give a moment for files to be written to disk
             Thread.sleep(2000);
             
-            // Verify that essential files were created
             verifyGeneratedFiles(instancePath);
             
             webSocketService.broadcastConsoleMessage(instance.getId(), 
@@ -231,9 +219,8 @@ public class ServerInstallationService {
             throw new RuntimeException("Failed to generate server files: " + e.getMessage(), e);
         }
     }
-    
+
     private void verifyGeneratedFiles(Path instancePath) throws IOException {
-        // Check for essential files that should be generated
         String[] essentialFiles = {
             "server.properties",
             "eula.txt"
@@ -241,9 +228,7 @@ public class ServerInstallationService {
         
         String[] essentialDirectories = {
             "logs",
-            "world",
-            "world_nether",
-            "world_the_end",
+            "world"
         };
         
         for (String fileName : essentialFiles) {
@@ -264,7 +249,6 @@ public class ServerInstallationService {
             }
         }
         
-        // Note: world directories are created when players join, so we don't check for them here
         log.info("File verification completed for instance path: {}", instancePath);
     }
     
@@ -272,18 +256,14 @@ public class ServerInstallationService {
         updateInstanceStatus(instance.getId(), InstallationStatus.CONFIGURING, "Configuring server settings...");
         
         try {
-            // Allocate ports
             int gamePort = portManagerService.findAvailablePort();
             int rconPort = portManagerService.findAvailableRconPort();
             
-            // Generate secure RCON password
             String rconPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
             
-            // Parse and set allocated memory
             String allocatedMemory = parseRam(template.hardwareRequirements());
             instance.setAllocatedMemory(allocatedMemory);
             
-            // Update instance with allocated ports and RCON settings
             instance.setPort(gamePort);
             instance.setRconPort(rconPort);
             instance.setRconPassword(rconPassword);
@@ -292,7 +272,6 @@ public class ServerInstallationService {
             
             serverInstanceRepository.save(instance);
             
-            // Configure server.properties
             configureServerProperties(instance, gamePort, rconPort, rconPassword);
             
             webSocketService.broadcastConsoleMessage(instance.getId(), 
@@ -308,7 +287,6 @@ public class ServerInstallationService {
     
     private void configureServerProperties(ServerInstance instance, int gamePort, int rconPort, String rconPassword) {
         try {
-            // Wait for server.properties to be generated if it doesn't exist yet
             Path propertiesPath = Paths.get(instance.getInstancePath()).resolve("server.properties");
             int attempts = 0;
             while (!Files.exists(propertiesPath) && attempts < 10) {
@@ -316,12 +294,10 @@ public class ServerInstallationService {
                 attempts++;
             }
             
-            // If server.properties doesn't exist, create a basic one
             if (!Files.exists(propertiesPath)) {
                 createDefaultServerProperties(propertiesPath);
             }
             
-            // Update properties
             serverPropertiesService.updateProperty(instance.getId(), "server-port", String.valueOf(gamePort)).join();
             serverPropertiesService.updateProperty(instance.getId(), "enable-rcon", "true").join();
             serverPropertiesService.updateProperty(instance.getId(), "rcon.port", String.valueOf(rconPort)).join();

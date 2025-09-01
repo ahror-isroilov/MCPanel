@@ -5,7 +5,7 @@
 const SystemMonitor = {
     ws: null,
     refreshInterval: null,
-    dom: {}, // To cache DOM element references
+    dom: {},
 
     init() {
         this.cacheDomElements();
@@ -19,7 +19,6 @@ const SystemMonitor = {
         this.dom.alertSection = document.getElementById('alert-section');
         this.dom.lastUpdateTime = document.getElementById('last-update-time');
 
-        // Resource Usage
         this.dom.cpuUsageValue = document.getElementById('cpu-usage-value');
         this.dom.cpuProgress = document.getElementById('cpu-progress');
         this.dom.ramUsageValue = document.getElementById('ram-usage-value');
@@ -83,11 +82,9 @@ const SystemMonitor = {
     },
 
     updateAllStats(stats) {
-        // Handle both direct stats and nested system/jvm structure
         const systemData = stats.system || stats;
         const jvmData = stats.jvm || {};
 
-        // --- Resource Usage ---
         const cpuPercent = Math.round(systemData.cpuUsage || 0);
         this.updateProgress(this.dom.cpuUsageValue, this.dom.cpuProgress, cpuPercent, 60, 80, `${cpuPercent}%`);
 
@@ -106,15 +103,12 @@ const SystemMonitor = {
             this.dom.jvmProcessors.textContent = jvmData.availableProcessors || 'N/A';
         }
 
-        // --- System Info ---
         this.dom.cpuCores.textContent = systemData.cpuCores || 'N/A';
         this.dom.loadAverage.textContent = (systemData.loadAverage !== undefined ? systemData.loadAverage.toFixed(2) : 'N/A');
         this.dom.systemUptime.textContent = systemData.systemUptime || 'N/A';
 
-        // --- Service Status ---
         this.dom.websocketSessions.textContent = systemData.activeWebSocketSessions || 0;
 
-        // --- Alerts & Timestamp ---
         this.updateAlerts(systemData);
         this.dom.lastUpdateTime.textContent = new Date().toLocaleString();
     },
@@ -169,12 +163,10 @@ const SystemMonitor = {
                 const totalServers = data.totalServers || 0;
                 const runningServers = data.runningServers || 0;
                 
-                // Update server counts
                 this.dom.totalServers.textContent = totalServers;
                 this.dom.runningServers.textContent = runningServers;
                 this.dom.runningServers.className = `service-value ${runningServers > 0 ? '' : 'danger'}`;
                 
-                // Update overall status
                 this.dom.minecraftStatus.textContent = isOnline ? 'Online' : 'Offline';
                 this.dom.minecraftStatus.className = `service-value ${isOnline ? '' : 'danger'}`;
             }

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const href = this.getAttribute('href');
 
             if (href && href.startsWith('/') && !this.getAttribute('target')) {
-                e.preventDefault(); // Stop the browser from navigating instantly
+                e.preventDefault();
 
                 if (wrapper) {
                     wrapper.classList.remove('is-visible');
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 setTimeout(() => {
                     window.location.href = href;
-                }, 150); // This duration should match the CSS transition time
+                }, 150);
             }
         });
     });
