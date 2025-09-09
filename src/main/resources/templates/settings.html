@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments/common :: head(title='Minecraft Server - Settings')}"></th:block>
+    <link th:href="@{/css/settings.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/_icon :: sprite}"></div>
+<div class="page-transition-wrapper">
+    <div th:replace="~{fragments/common :: main-navbar(breadcrumbs=${breadcrumbs})}"></div>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">Account Settings</h1>
+        </div>
+
+        <div class="notification-container" id="notification-container"></div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Change Username</h3></div>
+                <div class="card-content">
+                    <form id="change-username-form">
+                        <div class="form-group">
+                            <label for="new-username">New Username</label>
+                            <input type="text" id="new-username" name="newUsername" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Change Password</h3></div>
+                <div class="card-content">
+                    <form id="change-password-form">
+                        <div class="form-group">
+                            <label for="old-password">Old Password</label>
+                            <input type="password" id="old-password" name="oldPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">New Password</label>
+                            <input type="password" id="new-password" name="newPassword" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Delete Account</h3></div>
+                <div class="card-content">
+                    <p>This action is irreversible. All your data will be permanently deleted.</p>
+                    <div class="form-actions">
+                        <button id="delete-account-btn" class="btn btn-danger">Delete My Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/settings.js}" defer></script>
+<th:block th:insert="~{fragments/common :: common-scripts}"></th:block>
+
+</body>
+</html>

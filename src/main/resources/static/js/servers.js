@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const onlineCount = serverData.filter(s => s.online).length;
         onlineServerCount.textContent = onlineCount;
 
-        // Get all existing server cards
         const existingCards = Array.from(serverGrid.querySelectorAll('[data-server-id]'));
 
         existingCards.forEach(card => {
@@ -101,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             stopBtn.style.display = server.online ? 'inline-flex' : 'none';
         }
 
-        // Update new metrics
         const ramUsageEl = card.querySelector('.ram-usage-value');
         const diskUsageEl = card.querySelector('.disk-usage-value');
         const portEl = card.querySelector('.server-port');
@@ -111,8 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (ramUsageEl) {
-            const ramUsage = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
-            ramUsageEl.textContent = ramUsage;
+            ramUsageEl.textContent = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
         }
 
         if (diskUsageEl) {
@@ -142,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="status-indicator ${onlineStatus}"></div>
                     <div class="header-content">
                         <a href="/servers/${server.instanceId}/server" class="server-name">${server.name}</a>
-                        <span class="server-port">:${server.port}</span>
                     </div>
                     <div class="card-actions">
                         <button class="start-btn" style="display: ${startBtnDisplay};">Start</button>
