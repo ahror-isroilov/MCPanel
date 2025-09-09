@@ -30,11 +30,11 @@
                 </div>
             </div>
             <div class="nav-right">
-                <a href="/system" class="logout-icon-btn" title="System">
-                    <span th:replace="~{fragments/_icon :: icon(iconName='system', className='icon-medium')}"></span>
-                </a>
                 <a href="/settings" class="logout-icon-btn" title="Settings">
                     <span th:replace="~{fragments/_icon :: icon(iconName='settings', className='icon-medium')}"></span>
+                </a>
+                <a href="/system" class="logout-icon-btn" title="System">
+                    <span th:replace="~{fragments/_icon :: icon(iconName='system', className='icon-medium')}"></span>
                 </a>
                 <form method="post" th:action="@{/logout}">
                     <button class="logout-icon-btn" type="submit" title="Logout">

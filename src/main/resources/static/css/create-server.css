@@ -108,7 +108,7 @@
 
 .filter-btn.active {
     background: var(--accent);
-    color: var(--bg-main);
+    color: var(--text-primary);
     border-color: var(--accent);
     font-weight: 600;
 }
@@ -199,7 +199,7 @@
 
 .install-button {
     background: var(--accent);
-    color: var(--bg-main);
+    color: var(--text-primary);
     border: none;
     border-radius: 10px;
     padding: 12px 16px;
@@ -294,7 +294,7 @@
     width: 100%;
     padding: 12px;
     background: var(--accent);
-    color: var(--bg-main);
+    color: var(--text-primary);
     border: none;
     border-radius: 10px;
     font-size: 14px;

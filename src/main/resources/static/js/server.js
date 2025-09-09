@@ -26,7 +26,6 @@ function setButtonLoading(button, loading) {
         }
     } else {
         button.classList.remove('loading');
-        // Restore original icon
         const action = button.id.split('-')[0];
         const icon = button.querySelector('i');
         if (icon) {
@@ -59,17 +58,14 @@ function updateServerStatusUI(status) {
     serverStatus = status;
     const isOnline = status.online;
 
-    // Header status
     const statusTag = document.getElementById('server-status-tag');
     statusTag.textContent = isOnline ? 'Running' : 'Stopped';
     statusTag.className = `status-tag ${isOnline ? 'status-running' : 'status-stopped'}`;
 
-    // Header buttons
     document.getElementById('start-server-btn').style.display = isOnline ? 'none' : 'flex';
     document.getElementById('restart-server-btn').style.display = isOnline ? 'flex' : 'none';
     document.getElementById('stop-server-btn').style.display = isOnline ? 'flex' : 'none';
 
-    // Main content status
     document.getElementById('server-status-indicator').className = `status-dot ${isOnline ? 'online' : ''}`;
     document.getElementById('server-online').textContent = isOnline ? 'Online' : 'Offline';
     document.getElementById('players-count').textContent = `${status.playersOnline}/${status.maxPlayers}`;
@@ -78,9 +74,8 @@ function updateServerStatusUI(status) {
     document.getElementById('server-version').textContent = status.version || 'N/A';
     document.getElementById('server-world').textContent = status.worldName || 'N/A';
     document.getElementById('cpu-usage').textContent = `${Math.round(status.cpuUsage || 0)}%`;
-    document.getElementById('ram-usage').textContent = `${status.ramUsage || 0} GB / ${status.totalRam || 0} GB`;
-    document.getElementById('disk-usage').textContent = `${status.diskUsage || 0} GB / ${status.totalDisk || 0} GB`;
-    document.getElementById('last-updated').textContent = new Date(status.lastUpdated).toLocaleString();
+    document.getElementById('ram-usage').textContent = status.online ? `${status.instanceRamUsage.toFixed(2)} MB / ${status.allocatedRam.toFixed(2)} MB` : 'Offline';
+    document.getElementById('disk-usage').textContent = `${status.diskUsage.toFixed(2)} MB`;
     updatePlayerList(status.onlinePlayers || []);
 }
 

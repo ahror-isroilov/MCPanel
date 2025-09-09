@@ -3,6 +3,7 @@
     --bg-card: hsl(0, 0%, 8%);
     --bg-hover: hsl(0, 0%, 12%);
     --border-color: hsl(0, 0%, 15%);
+    --border-color-danger: hsl(0, 27%, 21%);
     --text-primary: hsl(0, 0%, 95%);
     --text-secondary: hsl(0, 0%, 60%);
     --accent: hsl(210, 80%, 60%);
@@ -121,10 +122,9 @@ body {
 
 .logout-icon-btn:hover {
     background: var(--bg-hover);
-    color: var(--danger);
+    color: var(--warning);
 }
 
-/* Main content layout */
 .main-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -190,7 +190,6 @@ body {
 .alert-warning { background: hsla(38, 80%, 50%, 0.1); border-color: hsla(38, 80%, 50%, 0.2); color: hsl(38, 80%, 65%); }
 .alert-danger { background: hsla(0, 70%, 50%, 0.1); border-color: hsla(0, 70%, 50%, 0.2); color: hsl(0, 70%, 65%); }
 
-/* Card Layout */
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -231,7 +230,6 @@ body {
 .progress-fill.warning { background: var(--warning); }
 .progress-fill.danger { background: var(--danger); }
 
-/* System Info & Services */
 .info-grid, .service-list { display: flex; flex-direction: column; gap: 14px; }
 .info-item, .service-item { display: flex; justify-content: space-between; align-items: center; }
 .info-label, .service-label { font-size: 14px; color: var(--text-secondary); }

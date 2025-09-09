@@ -38,7 +38,6 @@ public class ServerStatus {
     private double networkIn;
     private double networkOut;
 
-    // Instance-specific metrics
     private double instanceRamUsage;
     private double allocatedRam;
     private double instanceDiskUsage;

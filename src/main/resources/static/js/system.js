@@ -28,13 +28,11 @@ const SystemMonitor = {
         this.dom.jvmMemoryValue = document.getElementById('jvm-memory-value');
         this.dom.jvmProgress = document.getElementById('jvm-progress');
 
-        // System Info
         this.dom.cpuCores = document.getElementById('cpu-cores');
         this.dom.loadAverage = document.getElementById('load-average');
         this.dom.systemUptime = document.getElementById('system-uptime');
         this.dom.jvmProcessors = document.getElementById('jvm-processors');
 
-        // Service Status
         this.dom.totalServers = document.getElementById('total-servers');
         this.dom.runningServers = document.getElementById('running-servers');
         this.dom.minecraftStatus = document.getElementById('minecraft-status');
@@ -71,7 +69,6 @@ const SystemMonitor = {
             const result = await response.json();
             if (result.success) {
                 this.updateAllStats(result.data);
-                // Fetch server status separately if needed, though ideally it's in the main payload
                 this.updateMinecraftStatus();
             } else {
                 console.error('Failed to load system stats:', result.error);

@@ -54,13 +54,10 @@ public class ServerInstanceController {
             @RequestParam String name,
             @RequestParam String templateId) {
         try {
-            // Create the server instance with PENDING_INSTALLATION status
             ServerInstance instance = minecraftServerService.createServerInstance(name, templateId);
             
-            // Trigger async installation
             serverInstallationService.installServer(instance.getId(), templateId);
             
-            // Return 202 Accepted with the newly created server object
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(ApiResponse.success(instance));
         } catch (IllegalArgumentException e) {

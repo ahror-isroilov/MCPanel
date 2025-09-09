@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteAccountBtn = document.getElementById('delete-account-btn');
     const notificationContainer = document.getElementById('notification-container');
 
+    const deleteModal = document.getElementById('delete-account-modal');
+    const closeDeleteModalBtn = document.getElementById('close-delete-modal');
+    const cancelDeleteBtn = document.getElementById('cancel-delete');
+    const confirmDeleteBtn = document.getElementById('confirm-delete');
+
     function showNotification(message, type = 'success') {
         const notification = document.createElement('div');
         notification.className = `notification alert-${type}`;
@@ -13,6 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
             notification.classList.add('removing');
             setTimeout(() => notification.remove(), 300);
         }, 4000);
+    }
+
+    function setButtonLoading(button, loading) {
+        if (!button) return;
+        button.disabled = loading;
+        if (loading) {
+            button.classList.add('loading');
+            const originalText = button.textContent;
+            button.dataset.originalText = originalText;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        } else {
+            button.classList.remove('loading');
+            const originalText = button.dataset.originalText || 'Action';
+            button.innerHTML = originalText;
+            delete button.dataset.originalText;
+        }
     }
 
     changeUsernameForm.addEventListener('submit', async (e) => {
@@ -49,16 +70,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    deleteAccountBtn.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to delete your account? This action is irreversible.')) {
-            const response = await fetch('/api/user/delete', { method: 'DELETE' });
+    deleteAccountBtn.addEventListener('click', () => {
+        deleteModal.style.display = 'flex';
+    });
+
+    closeDeleteModalBtn.addEventListener('click', () => {
+        deleteModal.style.display = 'none';
+    });
+
+    cancelDeleteBtn.addEventListener('click', () => {
+        deleteModal.style.display = 'none';
+    });
+
+    deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+            deleteModal.style.display = 'none';
+        }
+    });
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+        try {
+            setButtonLoading(confirmDeleteBtn, true);
+            const response = await fetch('/api/user/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
             const result = await response.json();
+
             if (result.success) {
                 showNotification(result.message, 'success');
-                setTimeout(() => window.location.href = '/login', 2000);
+                deleteModal.style.display = 'none';
+
+                setTimeout(() => {
+                    window.location.href = result.data || '/login';
+                }, 1000);
             } else {
-                showNotification(result.error, 'error');
+                showNotification(result.error || 'Failed to delete account', 'error');
+                setButtonLoading(confirmDeleteBtn, false);
             }
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            showNotification('An error occurred while deleting the account', 'error');
+            setButtonLoading(confirmDeleteBtn, false);
         }
     });
 });

@@ -1,21 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Dynamic Header Title
     const titles = [
         "Forge Your World",
         "Craft Your Realm",
         "Build Your Universe",
         "Start a New Adventure",
-        "Create Your Legacy"
+        "Create Your Legacy",
+        "Shape Your Destiny",
+        "Architect Your Empire",
+        "Weave Your Saga",
+        "Sculpt Your Reality",
+        "Design Your Existence",
+        "Mold Your Kingdom",
+        "Command Your Dominion",
+        "Define Your Era",
+        "Rule Your Horizon",
+        "Conquer Your Fate",
+        "Etch Your Legend",
+        "Master Your Domain",
+        "Ignite Your Odyssey",
+        "Unfold Your Epic",
+        "Chart a New Frontier",
+        "Begin Your Genesis",
+        "Launch Your Saga",
+        "Author Your Myth",
+        "Dream a New Dawn",
+        "A Tapestry of Your Making",
+        "An Echo of Your Will",
+        "Your Universe Awaits"
     ];
-    let currentTitleIndex = 0;
     const pageTitle = document.querySelector('.page-title');
 
     if (pageTitle) {
+        let currentTitleIndex = 0;
+
         setInterval(() => {
-            currentTitleIndex = (currentTitleIndex + 1) % titles.length;
-            
+            let newTitleIndex;
+            do {
+                newTitleIndex = Math.floor(Math.random() * titles.length);
+            } while (newTitleIndex === currentTitleIndex);
+
+            currentTitleIndex = newTitleIndex;
+
             pageTitle.classList.add('fade-out');
-            
+
             setTimeout(() => {
                 pageTitle.textContent = titles[currentTitleIndex];
                 pageTitle.classList.remove('fade-out');

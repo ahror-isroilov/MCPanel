@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const existingCard = serverGrid.querySelector(`[data-server-id="${server.instanceId}"]`);
             if (!existingCard) {
                 const newCard = createServerCard(server);
-                // Insert before the "Add New Server" card
                 const addServerCard = serverGrid.querySelector('.add-server-card');
                 if (addServerCard) {
                     serverGrid.insertBefore(newCard, addServerCard);
@@ -187,11 +186,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (result.success) {
                 showNotification(`Server ${action} command issued successfully.`, 'success');
-                // Refresh server data after a delay and re-enable button
                 setTimeout(() => {
                     fetchServerData();
                     setButtonLoading(button, false);
-                }, 3000);
+                }, 2500);
             } else {
                 showNotification(`Failed to ${action} server: ${result.error}`, 'error');
                 setButtonLoading(button, false);
