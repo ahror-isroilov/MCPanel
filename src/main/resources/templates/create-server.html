@@ -56,7 +56,9 @@
 
 <div id="install-modal" class="modal" style="display:none;">
     <div class="modal-content">
-        <span class="close-button">&times;</span>
+        <button class="close-btn" id="close-delete-modal">
+            <span th:replace="~{fragments/_icon :: icon(iconName='close', className='icon-medium')}"></span>
+        </button>
         <h2>Install <span id="modal-template-name"></span></h2>
         <form id="install-form">
             <div class="form-group">

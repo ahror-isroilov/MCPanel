@@ -47,8 +47,8 @@
 
 .page-title {
     font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 42px;
+    font-weight: 800;
+    font-size: 64px;
     background: linear-gradient(135deg, var(--accent), hsl(280, 70%, 60%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
