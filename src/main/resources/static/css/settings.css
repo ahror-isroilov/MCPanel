@@ -1,0 +1,278 @@
+/* Common styles from system.css for consistency */
+:root {
+    --bg-main: hsl(0, 0%, 4%);
+    --bg-card: hsl(0, 0%, 8%);
+    --bg-hover: hsl(0, 0%, 12%);
+    --border-color: hsl(0, 0%, 15%);
+    --text-primary: hsl(0, 0%, 95%);
+    --text-secondary: hsl(0, 0%, 60%);
+    --accent: hsl(210, 80%, 60%);
+    --success: hsl(142, 70%, 40%);
+    --danger: hsl(0, 70%, 55%);
+    --warning: hsl(38, 80%, 50%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Manrope', sans-serif;
+    background: #121212 radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 30%) fixed;
+    background-size: 100% 100%;
+    min-height: 100vh;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.navbar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 24px;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-left, .nav-right, .nav-center {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav-right form {
+    margin: 0;
+}
+
+.nav-center {
+    flex: 1;
+    justify-content: center;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.brand-text {
+    font-family: 'Minecraft', sans-serif;
+    font-weight: bold;
+    font-size: 22px;
+    color: #FFAA00;
+    text-shadow: 2px 2px #000000;
+    white-space: nowrap;
+}
+
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.breadcrumb-item {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item:hover {
+    color: var(--text-primary);
+}
+
+.breadcrumb-item.active {
+    color: var(--text-primary);
+    pointer-events: none;
+}
+
+.breadcrumb-separator {
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+.logout-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.logout-icon-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* Settings page specific styles */
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-header {
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.cards-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+}
+
+.card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.card-content p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px hsla(210, 80%, 60%, 0.2);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--bg-main);
+}
+
+.btn-primary:hover {
+    background: hsl(210, 80%, 55%);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: var(--text-primary);
+}
+
+.btn-danger:hover {
+    background: hsl(0, 70%, 50%);
+}
+
+.notification-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1050;
+    width: 300px;
+}
+
+.notification {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0.95;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.notification.alert-success {
+    border-left: 4px solid var(--success);
+}
+
+.notification.alert-error {
+    border-left: 4px solid var(--danger);
+}
+
+.notification.removing {
+    opacity: 0;
+    transform: translateX(100%);
+}

@@ -105,4 +105,13 @@ public class WebController {
         }});
         return "create-server";
     }
+
+    @GetMapping("/settings")
+    public String settings(Model model) {
+        model.addAttribute("breadcrumbs", new java.util.LinkedHashMap<String, String>() {{
+            put("Servers", "/servers");
+            put("Settings", null);
+        }});
+        return "settings";
+    }
 }
