@@ -3,13 +3,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Minecraft Panel - Create Server</title>
-    <th:block th:insert="~{fragments/common :: common-head}"></th:block>
+    <th:block th:insert="~{fragments/common :: head(title='Minecraft Panel - Create Server')}"></th:block>
     <link th:href="@{/css/servers.css}" rel="stylesheet">
     <link th:href="@{/css/create-server.css}" rel="stylesheet">
 </head>
 <body>
-
+<div th:replace="~{fragments/_icon :: sprite}"></div>
 <div class="page-transition-wrapper">
     <div class="notification-container" id="notification-container"></div>
     <div th:replace="~{fragments/common :: main-navbar(breadcrumbs=${breadcrumbs})}"></div>

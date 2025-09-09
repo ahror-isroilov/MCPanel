@@ -3,14 +3,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Minecraft Server - Console</title>
-    <th:block th:insert="~{fragments/common :: common-head}"></th:block>
+    <th:block th:insert="~{fragments/common :: head(title='Minecraft Server - Console')}"></th:block>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link th:href="@{/css/servers.css}" rel="stylesheet">
     <link th:href="@{/css/console.css}" rel="stylesheet">
 </head>
 <body th:data-instance-id="${instanceId}">
-
+<div th:replace="~{fragments/_icon :: sprite}"></div>
 <div class="page-transition-wrapper">
     <div class="notification-container" id="notification-container"></div>
     <div th:replace="~{fragments/common :: server-navbar(instanceId=${instanceId}, serverName=${instanceName}, activePage='console')}"></div>

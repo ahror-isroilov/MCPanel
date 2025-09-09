@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Minecraft Server - System Monitoring</title>
-    <th:block th:insert="~{fragments/common :: common-head}"></th:block>
+    <th:block th:insert="~{fragments/common :: head(title='Minecraft Server - System Monitoring')}"></th:block>
     <link th:href="@{/css/system.css}" rel="stylesheet">
 </head>
 <body>
+<div th:replace="~{fragments/_icon :: sprite}"></div>
 <div class="page-transition-wrapper">
     <div th:replace="~{fragments/common :: main-navbar(breadcrumbs=${breadcrumbs})}"></div>
 

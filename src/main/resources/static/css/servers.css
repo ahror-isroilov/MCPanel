@@ -151,7 +151,7 @@ body {
 
 .logout-icon-btn:hover {
     background: var(--bg-hover);
-    color: var(--danger);
+    color: var(--warning);
 }
 
 .main-container {

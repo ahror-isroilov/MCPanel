@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:fragment="head">
+
+<head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} ?: 'MCPanel'"></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/transitions.css}">
+    <link rel="stylesheet" th:href="@{/css/icons.css}">
 </head>
 
 <body>
-
 <div class="page-transition-wrapper">
     <nav class="navbar" th:fragment="main-navbar(breadcrumbs)">
         <div class="nav-container">
@@ -29,22 +31,14 @@
             </div>
             <div class="nav-right">
                 <a href="/system" class="logout-icon-btn" title="System">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
+                    <span th:replace="~{fragments/_icon :: icon(iconName='system', className='icon-medium')}"></span>
                 </a>
-                <a href="/settings" class="logout-icon-btn" title="Account">
-                    <i class="fas fa-user-circle" style="font-size: 20px;"></i>
+                <a href="/settings" class="logout-icon-btn" title="Settings">
+                    <span th:replace="~{fragments/_icon :: icon(iconName='settings', className='icon-medium')}"></span>
                 </a>
                 <form method="post" th:action="@{/logout}">
                     <button class="logout-icon-btn" type="submit" title="Logout">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9,21H5a2,2 0,0 1,-2,-2V5A2,2 0,0 1,5,3H9"></path>
-                            <polyline points="16,17 21,12 16,7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
+                        <span th:replace="~{fragments/_icon :: icon(iconName='logout', className='icon-medium')}"></span>
                     </button>
                 </form>
             </div>
@@ -52,25 +46,6 @@
     </nav>
 </div>
 
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-
-<head>
-    <!-- Common head content: meta tags, fonts, global CSS -->
-    <th:block th:fragment="common-head">
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
-        <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" th:href="@{/css/transitions.css}">
-    </th:block>
-</head>
-
-<body>
 <nav class="navbar" th:fragment="server-navbar(instanceId, serverName, activePage)">
     <div class="nav-container">
         <div class="nav-left">
@@ -91,19 +66,11 @@
         </div>
         <div class="nav-right">
             <a href="/system" class="logout-icon-btn" title="System">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
+                <span th:replace="~{fragments/_icon :: icon(iconName='system', className='icon-medium')}"></span>
             </a>
             <form method="post" th:action="@{/logout}">
                 <button class="logout-icon-btn" type="submit" title="Logout">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9,21H5a2,2 0,0 1,-2,-2V5A2,2 0,0 1,5,3H9"></path>
-                        <polyline points="16,17 21,12 16,7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
+                    <span th:replace="~{fragments/_icon :: icon(iconName='logout', className='icon-medium')}"></span>
                 </button>
             </form>
         </div>
@@ -116,8 +83,3 @@
 
 </body>
 </html>
-
-
-<script th:src="@{/js/transitions.js}"></script>
-
-    </html>

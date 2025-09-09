@@ -1,0 +1,63 @@
+.logout-icon-btn {
+    display: inline-block;
+    padding: 8px;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    color: #a0a0a0;
+}
+
+.logout-icon-btn:hover {
+    color: #ffffff;
+    background-color: #333333;
+}
+
+svg.icon-small, svg.icon-medium, svg.icon-large {
+    display: block;
+}
+
+.logout-icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.action-btn.btn-secondary.compact svg {
+    width: 14px;
+    height: 14px;
+}
+
+.empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.close-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.action-btn.btn-primary svg {
+    width: 14px;
+    height: 14px;
+}
+
+.delete-warning svg {
+    color: var(--warning);
+}
+
+.icon-medium {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-small {
+    width: 14px;
+    height: 14px;
+}
+
+.icon-large {
+    width: 48px;
+    height: 48px;
+}
