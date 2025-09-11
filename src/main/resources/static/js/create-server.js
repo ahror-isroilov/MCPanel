@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const modal = document.getElementById('install-modal');
-    const closeButton = document.querySelector('.close-btn'); // or document.getElementById('close-delete-modal')
+    const closeButton = document.getElementById('close-install-modal');
     const installForm = document.getElementById('install-form');
     const modalTemplateName = document.getElementById('modal-template-name');
     const modalTemplateIdInput = document.getElementById('modal-template-id');
@@ -61,12 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Fixed: Add null check for closeButton
-    if (closeButton) {
-        closeButton.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-    }
+    closeButton.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
 
     window.addEventListener('click', (e) => {
         if (e.target === modal) {

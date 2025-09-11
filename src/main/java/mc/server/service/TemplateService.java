@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mc.server.dto.ServerTemplate;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class TemplateService {
         }
     }
 
+    @Cacheable("templates")
     public ServerTemplate getTemplateById(String id) {
         return templates.stream()
                 .filter(t -> t.id().equals(id))

@@ -9,6 +9,7 @@ import mc.server.repository.ServerInstanceRepository;
 import mc.server.service.RconService;
 import mc.server.service.SystemMonitoringService;
 import mc.server.service.TemplateService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class MinecraftServerService {
     private final Map<Long, Integer> currentPlayerCounts = new ConcurrentHashMap<>();
 
 
+    @Cacheable("minecraftServerStatus")
     public ServerStatus getServerStatus(Long instanceId) {
         ServerInstance instance = getInstance(instanceId);
         try {

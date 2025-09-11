@@ -56,18 +56,22 @@
 
 <div id="install-modal" class="modal" style="display:none;">
     <div class="modal-content">
-        <button class="close-btn" id="close-delete-modal">
-            <span th:replace="~{fragments/_icon :: icon(iconName='close', className='icon-medium')}"></span>
-        </button>
-        <h2>Install <span id="modal-template-name"></span></h2>
-        <form id="install-form">
-            <div class="form-group">
-                <label for="instance-name">Instance Name</label>
-                <input type="text" id="instance-name" name="instanceName" placeholder="Enter a unique name" required>
-                <input type="hidden" id="modal-template-id" name="templateId">
-            </div>
-            <button type="submit" class="create-button">Start Installation</button>
-        </form>
+        <div class="modal-header">
+            <h2>Install <span id="modal-template-name"></span></h2>
+            <button class="close-btn" id="close-install-modal">
+                <span th:replace="~{fragments/_icon :: icon(iconName='close', className='icon-medium')}"></span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="install-form">
+                <div class="form-group">
+                    <label for="instance-name">Instance Name</label>
+                    <input type="text" id="instance-name" name="instanceName" placeholder="Enter a unique name" required>
+                    <input type="hidden" id="modal-template-id" name="templateId">
+                </div>
+                <button type="submit" class="create-button">Start Installation</button>
+            </form>
+        </div>
     </div>
 </div>
 

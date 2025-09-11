@@ -237,13 +237,17 @@
 .modal-content {
     background-color: var(--bg-card);
     margin: 15% auto;
-    padding: 2rem;
     border: 1px solid var(--border-color);
     width: 90%;
     max-width: 500px;
     border-radius: 12px;
     position: relative;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.modal-body {
+    padding: 2rem;
 }
 
 .close-button {
@@ -263,8 +267,8 @@
     cursor: pointer;
 }
 
-.modal-content h2 {
-    margin-bottom: 1.5rem;
+.modal-header h2 {
+    margin: 0;
     font-size: 20px;
     font-weight: 600;
 }
@@ -305,4 +309,34 @@
 
 .create-button:hover {
     background: hsl(210, 80%, 70%);
+}
+
+
+
+.modal-header {
+    padding: 20px 24px 16px 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.close-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
 }
