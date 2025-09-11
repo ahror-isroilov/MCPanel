@@ -65,4 +65,17 @@ public class UserController {
                         .build()
         );
     }
+
+    @DeleteMapping("/delete-all")
+    public ResponseEntity<ApiResponse<String>> deleteAllUsers() {
+        userService.deleteAllUsers();
+        InitialSetupRunner.setSetupRequired(true);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .success(true)
+                        .message("All accounts deleted")
+                        .data("/setup")
+                        .build()
+        );
+    }
 }

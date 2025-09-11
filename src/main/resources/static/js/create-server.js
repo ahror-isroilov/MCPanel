@@ -6,12 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
         "Start a New Adventure",
         "Create Your Legacy",
         "Shape Your Destiny",
-        "Architect Your Empire",
         "Weave Your Saga",
         "Sculpt Your Reality",
-        "Design Your Existence",
         "Mold Your Kingdom",
-        "Command Your Dominion",
         "Define Your Era",
         "Rule Your Horizon",
         "Conquer Your Fate",
@@ -24,22 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
         "Launch Your Saga",
         "Author Your Myth",
         "Dream a New Dawn",
-        "A Tapestry of Your Making",
         "An Echo of Your Will",
         "Your Universe Awaits"
     ];
+    let currentTitleIndex = 0;
     const pageTitle = document.querySelector('.page-title');
 
     if (pageTitle) {
-        let currentTitleIndex = 0;
-
         setInterval(() => {
-            let newTitleIndex;
-            do {
-                newTitleIndex = Math.floor(Math.random() * titles.length);
-            } while (newTitleIndex === currentTitleIndex);
-
-            currentTitleIndex = newTitleIndex;
+            currentTitleIndex = (currentTitleIndex + 1) % titles.length;
 
             pageTitle.classList.add('fade-out');
 
@@ -52,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const modal = document.getElementById('install-modal');
-    const closeButton = document.querySelector('.close-button');
+    const closeButton = document.querySelector('.close-btn'); // or document.getElementById('close-delete-modal')
     const installForm = document.getElementById('install-form');
     const modalTemplateName = document.getElementById('modal-template-name');
     const modalTemplateIdInput = document.getElementById('modal-template-id');
@@ -71,9 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    closeButton.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
+    // Fixed: Add null check for closeButton
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    }
 
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -81,42 +74,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    installForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const instanceName = instanceNameInput.value;
-        const templateId = modalTemplateIdInput.value;
+    if (installForm) {
+        installForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const instanceName = instanceNameInput.value;
+            const templateId = modalTemplateIdInput.value;
 
-        if (!instanceName || !templateId) {
-            alert('Instance name is required.');
-            return;
-        }
-        modal.style.display = 'none';
-        showNotification('Creating server instance...', 'info');
-        try {
-            const response = await fetch('/api/servers/create-and-install', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ instanceName, templateId }),
-            });
-
-            const data = await response.json();
-            
-            if (response.ok && data.success) {
-                showNotification('Redirecting to console...', 'success');
-                window.location.href = `/servers/${data.instanceId}/console`;
-            } else {
-                alert(`Error: ${data.error || 'Failed to create server instance'}`);
+            if (!instanceName || !templateId) {
+                alert('Instance name is required.');
+                return;
             }
-        } catch (error) {
-            console.error('Failed to create server instance:', error);
-            alert('An error occurred while creating the server instance.');
-        }
-    });
+            modal.style.display = 'none';
+            showNotification('Creating server instance...', 'info');
+            try {
+                const response = await fetch('/api/servers/create-and-install', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ instanceName, templateId }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showNotification('Redirecting to console...', 'success');
+                    window.location.href = `/servers/${data.instanceId}/console`;
+                } else {
+                    alert(`Error: ${data.error || 'Failed to create server instance'}`);
+                }
+            } catch (error) {
+                console.error('Failed to create server instance:', error);
+                alert('An error occurred while creating the server instance.');
+            }
+        });
+    }
 
     const filterButtons = document.querySelectorAll('.filter-btn');
     const templateCards = document.querySelectorAll('.template-card');
+
+    console.log('Filter buttons found:', filterButtons.length);
+    console.log('Template cards found:', templateCards.length);
 
     filterButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -124,9 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('active');
 
             const filter = button.dataset.filter;
-
             templateCards.forEach(card => {
-                if (filter === 'all' || card.dataset.type === filter) {
+                const cardType = card.dataset.type;
+                if (filter === 'all' || cardType === filter) {
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
@@ -134,14 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-    
+
     function showNotification(message, type = 'success') {
         const container = document.getElementById('notification-container');
         if (!container) {
             console.log('Notification: ' + message);
             return;
         }
-        
+
         const notification = document.createElement('div');
         notification.className = `notification alert-${type}`;
         notification.innerHTML = `<span>${message}</span>`;

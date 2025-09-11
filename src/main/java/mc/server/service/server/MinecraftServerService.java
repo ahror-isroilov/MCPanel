@@ -552,7 +552,7 @@ public class MinecraftServerService {
                 Path backupPath = backupDir.resolve(backupFile);
 
                 String command = String.format("tar -czf %s -C %s world world_nether world_the_end",
-                        backupPath.toString(), instance.getInstancePath());
+                        backupPath, instance.getInstancePath());
                 Process process = new ProcessBuilder(command.split(" ")).start();
                 int exitCode = process.waitFor();
 
