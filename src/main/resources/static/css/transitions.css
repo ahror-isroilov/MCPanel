@@ -2,7 +2,7 @@
 .page-transition-wrapper {
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 100ms ease-in-out, transform 100ms ease-in-out;
+    transition: opacity 50ms ease-in-out, transform 50ms ease-in-out;
 }
 
 .page-transition-wrapper.is-visible {

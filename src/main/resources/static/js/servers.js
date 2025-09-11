@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const portEl = card.querySelector('.server-port');
 
         if (portEl) {
-            portEl.textContent = `:${server.port}`;
+            portEl.textContent = server.port;
         }
 
         if (ramUsageEl) {
@@ -162,6 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="detail-item">
                         <span class="detail-label">Status:</span>
                         <span class="detail-value status-text">${onlineStatus}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Port:</span>
+                        <span class="detail-value server-port">${server.port}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">RAM Usage:</span>
