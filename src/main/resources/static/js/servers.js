@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const existingCard = serverGrid.querySelector(`[data-server-id="${server.instanceId}"]`);
             if (!existingCard) {
                 const newCard = createServerCard(server);
-                // Insert before the "Add New Server" card
                 const addServerCard = serverGrid.querySelector('.add-server-card');
                 if (addServerCard) {
                     serverGrid.insertBefore(newCard, addServerCard);
@@ -105,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const portEl = card.querySelector('.server-port');
 
         if (portEl) {
-            portEl.textContent = `:${server.port}`;
+            portEl.textContent = server.port;
         }
 
         if (ramUsageEl) {
@@ -165,6 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="detail-value status-text">${onlineStatus}</span>
                     </div>
                     <div class="detail-item">
+                        <span class="detail-label">Port:</span>
+                        <span class="detail-value server-port">${server.port}</span>
+                    </div>
+                    <div class="detail-item">
                         <span class="detail-label">RAM Usage:</span>
                         <span class="detail-value ram-usage-value">${ramUsage}</span>
                     </div>
@@ -187,11 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (result.success) {
                 showNotification(`Server ${action} command issued successfully.`, 'success');
-                // Refresh server data after a delay and re-enable button
                 setTimeout(() => {
                     fetchServerData();
                     setButtonLoading(button, false);
-                }, 3000);
+                }, 2500);
             } else {
                 showNotification(`Failed to ${action} server: ${result.error}`, 'error');
                 setButtonLoading(button, false);

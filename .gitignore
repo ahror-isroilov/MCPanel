@@ -43,3 +43,5 @@ servers/**
 gradle/**
 java/*
 data/*
+
+.env

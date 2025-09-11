@@ -706,7 +706,6 @@ body {
     pointer-events: none;
 }
 
-/* Empty State Styles */
 .empty-state {
     display: flex;
     flex-direction: column;

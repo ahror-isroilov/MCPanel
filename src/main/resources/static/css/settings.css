@@ -1,9 +1,10 @@
-/* Common styles from system.css for consistency */
 :root {
     --bg-main: hsl(0, 0%, 4%);
     --bg-card: hsl(0, 0%, 8%);
+    --bg-card-danger: hsl(0, 31%, 10%);
     --bg-hover: hsl(0, 0%, 12%);
     --border-color: hsl(0, 0%, 15%);
+    --border-color-danger: hsl(0, 38%, 25%);
     --text-primary: hsl(0, 0%, 95%);
     --text-secondary: hsl(0, 0%, 60%);
     --accent: hsl(210, 80%, 60%);
@@ -119,7 +120,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Settings page specific styles */
 .main-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -151,6 +151,15 @@ body {
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+}
+
+.card-danger {
+    background: var(--bg-card-danger);
+    border: 1px solid var(--border-color-danger);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     width: 100%;
@@ -228,7 +237,7 @@ body {
 
 .btn-primary {
     background: var(--accent);
-    color: var(--bg-main);
+    color: var(--text-primary);
 }
 
 .btn-primary:hover {
@@ -242,6 +251,145 @@ body {
 
 .btn-danger:hover {
     background: hsl(0, 70%, 50%);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 450px;
+    width: 90vw;
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px 24px 16px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.close-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.delete-warning {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.delete-warning svg {
+    color: var(--warning);
+}
+
+.delete-warning p {
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.delete-warning strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.warning-text {
+    color: var(--danger) !important;
+    font-weight: 500;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-secondary {
+    background: hsl(0, 0%, 20%);
+    color: hsl(0, 0%, 85%);
+    border: 1px solid hsl(0, 0%, 30%);
+}
+
+.btn-secondary:hover {
+    background: hsl(0, 0%, 25%);
+}
+
+.btn-danger-subtle {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.btn-danger-subtle:hover {
+    background: var(--bg-hover);
+    color: hsl(0, 75%, 55%);
+}
+
+.action-btn.loading {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .notification-container {

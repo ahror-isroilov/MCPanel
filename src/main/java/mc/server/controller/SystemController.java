@@ -27,7 +27,6 @@ public class SystemController {
             Map<String, Object> systemStats = systemMonitoringService.getSystemStats();
             Map<String, Object> jvmStats = systemMonitoringService.getJvmStats();
             
-            // Combine both stats into a single response
             Map<String, Object> allStats = Map.of(
                 "system", systemStats,
                 "jvm", jvmStats
@@ -44,7 +43,6 @@ public class SystemController {
     @GetMapping("/status")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getOverallServerStatus() {
         try {
-            // Get status of all server instances
             var serverInstances = serverInstanceRepository.findAll();
             int totalServers = serverInstances.size();
             int runningServers = 0;

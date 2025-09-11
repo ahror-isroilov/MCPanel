@@ -51,7 +51,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
             if (instanceName != null) {
                 session.getAttributes().put("instanceName", instanceName);
                 log.info("Installation WebSocket connection established for instance {}: {}", instanceName, session.getId());
-                // Using a temporary ID for installation messages
                 webSocketService.addSession(-1L, session);
             } else {
                 log.error("Could not determine instanceName from WebSocket session URI: {}", session.getUri());

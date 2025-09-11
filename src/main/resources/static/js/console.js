@@ -3,13 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const consoleOutput = document.getElementById('console-output');
     const commandInput = document.getElementById('command-input');
     
-    // Header elements
     const startServerBtn = document.getElementById('start-server-btn');
     const restartServerBtn = document.getElementById('restart-server-btn');
     const stopServerBtn = document.getElementById('stop-server-btn');
     const serverStatusTag = document.getElementById('server-status-tag');
 
-    // Status bar elements
     const connectionDot = document.getElementById('connection-dot');
     const connectionStatusEl = document.getElementById('connection-status');
     const lineCountEl = document.getElementById('line-count');

@@ -30,11 +30,11 @@
                 </div>
             </div>
             <div class="nav-right">
-                <a href="/system" class="logout-icon-btn" title="System">
-                    <span th:replace="~{fragments/_icon :: icon(iconName='system', className='icon-medium')}"></span>
-                </a>
                 <a href="/settings" class="logout-icon-btn" title="Settings">
                     <span th:replace="~{fragments/_icon :: icon(iconName='settings', className='icon-medium')}"></span>
+                </a>
+                <a href="/system" class="logout-icon-btn" title="System">
+                    <span th:replace="~{fragments/_icon :: icon(iconName='system', className='icon-medium')}"></span>
                 </a>
                 <form method="post" th:action="@{/logout}">
                     <button class="logout-icon-btn" type="submit" title="Logout">
@@ -76,6 +76,18 @@
         </div>
     </div>
 </nav>
+
+<footer th:fragment="footer" class="footer">
+    <div class="footer-container">
+        <p class="footer-text">
+            MCPanel © 2025. All rights reserved.
+        </p>
+        <p class="footer-opensource">
+            Open-source Minecraft server management panel.
+            <a href="https://github.com/your-repo/mcpanel" target="_blank" rel="noopener noreferrer">Contribute on GitHub</a>.
+        </p>
+    </div>
+</footer>
 
 <th:block th:fragment="common-scripts">
     <script th:src="@{/js/transitions.js}"></script>

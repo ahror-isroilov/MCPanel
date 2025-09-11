@@ -3,6 +3,7 @@ package mc.server.service;
 import lombok.RequiredArgsConstructor;
 import mc.server.model.User;
 import mc.server.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @CacheEvict(value = "users", allEntries = true)
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -33,7 +35,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUser(User user) {
-        userRepository.delete(user);
+    public void deleteUser(String username) {
+        userRepository.deleteUserByUsername(username);
+    }
+
+    public void deleteAllUsers() {
+        userRepository.deleteAll();
     }
 }

@@ -1,7 +1,5 @@
 server:
   port: 3443
-  servlet:
-    context-path: /
 
 spring:
   application:
@@ -9,27 +7,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
   h2:
     console:
-      enabled: true
+      enabled: false
   datasource:
-    url: jdbc:h2:file:./data/minecraft-panel-db
+    url: jdbc:h2:file:./data/minecraft-panel-db;AUTO_SERVER=TRUE
     driverClassName: org.h2.Driver
     username: sa
-    password: ''
-
-  security:
-    user:
-      name: ahror
-      password: rorha4002
-      roles: ADMIN
+    password: '${DB_PASSWORD:defaultSecretPassword}'
 
   web:
     resources:
       static-locations: classpath:/static/
   thymeleaf:
-    cache: false
+    cache: true
     enabled: true
     prefix: classpath:/templates/
     suffix: .html
@@ -48,9 +40,9 @@ spring:
 
 logging:
   level:
-    mc.server: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web.socket: DEBUG
+    mc.server: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
     nl.vv32.rcon: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -59,10 +51,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: never
 
 minecraft:
   security:

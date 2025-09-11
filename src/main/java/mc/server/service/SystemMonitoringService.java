@@ -2,6 +2,7 @@ package mc.server.service;
 
 import lombok.extern.slf4j.Slf4j;
 import mc.server.model.ServerInstance;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -24,6 +25,8 @@ import java.util.regex.Pattern;
 @Service
 public class SystemMonitoringService {
     private final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+
+    @Cacheable("systemStats")
     public Map<String, Object> getSystemStats() {
         Map<String, Object> stats = new HashMap<>();
         try {
