@@ -804,6 +804,12 @@ public class MinecraftServerService {
         log.info("Successfully deleted server instance: {}", instance.getName());
     }
 
+    public void updateAllocatedMemory(Long instanceId, String memory) {
+        ServerInstance instance = getInstance(instanceId);
+        instance.setAllocatedMemory(memory);
+        serverInstanceRepository.save(instance);
+    }
+
     private void deleteDirectoryRecursively(Path path) throws IOException {
         if (Files.isDirectory(path)) {
             try (var stream = Files.walk(path)) {

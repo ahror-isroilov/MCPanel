@@ -106,6 +106,8 @@
                     </div>
                 </div>
 
+
+
                 <div class="card full-width card-scrollable">
                     <div class="card-header">
                         <h3 class="card-title">Online Players</h3>
@@ -128,14 +130,21 @@
             <div class="sidebar-column">
                 <div class="card card-scrollable">
                     <div class="card-header">
-                        <h3 class="card-title">Core Properties</h3>
-                        <button class="action-btn btn-secondary compact" id="refresh-properties">
-                            <span th:replace="~{fragments/_icon :: icon(iconName='refresh', className='icon-small')}"></span>
-                            <span>Reload</span>
-                        </button>
+                        <h3 class="card-title">World Properties</h3>
+                        <button class="action-btn btn-primary compact" id="save-world-properties">Save</button>
                     </div>
                     <div class="card-content">
-                        <div class="properties-editor" id="properties-editor">
+                        <div class="properties-editor" id="world-properties-editor">
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-scrollable">
+                    <div class="card-header">
+                        <h3 class="card-title">Server Properties</h3>
+                        <button class="action-btn btn-primary compact" id="save-server-properties">Save</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="properties-editor" id="server-properties-editor">
                         </div>
                     </div>
                 </div>
