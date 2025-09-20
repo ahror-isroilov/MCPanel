@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/transitions.css}">
     <link rel="stylesheet" th:href="@{/css/icons.css}">
+    <link rel="stylesheet" th:href="@{/css/notifications.css}">
 </head>
 
 <body>
@@ -90,8 +91,11 @@
 </footer>
 
 <th:block th:fragment="common-scripts">
+    <script th:src="@{/js/notifications.js}"></script>
     <script th:src="@{/js/transitions.js}"></script>
 </th:block>
+
+<div th:fragment="notifications" class="notification-container" id="notification-container"></div>
 
 </body>
 </html>

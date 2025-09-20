@@ -19,19 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let commandHistory = [];
     let historyIndex = -1;
 
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        if (!container) return;
-        
-        const notification = document.createElement('div');
-        notification.className = `notification alert-${type}`;
-        notification.innerHTML = `<span>${message}</span>`;
-        container.appendChild(notification);
-        setTimeout(() => {
-            notification.classList.add('removing');
-            setTimeout(() => notification.remove(), 300);
-        }, 4000);
-    }
+
 
     function setButtonLoading(button, loading) {
         if (!button) return;
@@ -130,6 +118,21 @@ document.addEventListener('DOMContentLoaded', () => {
         lineCountEl.textContent = lineCount;
     }
 
+    async function loadServerStatus() {
+        try {
+            const response = await fetch(`/api/servers/${instanceId}/status`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            if (result.success) {
+                updateServerStatus(result.data);
+            }
+        } catch (error) {
+            console.error('Error fetching server status:', error);
+        }
+    }
+
     function updateServerStatus(status) {
         const isOnline = status.online;
         serverStatusEl.textContent = isOnline ? 'Online' : 'Offline';
@@ -202,4 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
     stopServerBtn.addEventListener('click', (e) => executeServerAction('stop', e.currentTarget));
 
     connect();
+    loadServerStatus();
+    setInterval(loadServerStatus, 10000);
 });

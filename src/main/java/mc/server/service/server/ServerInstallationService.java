@@ -196,12 +196,19 @@ public class ServerInstallationService {
                 ConsoleMessage.info("Waiting for server to initialize and generate files..."));
             
             boolean processFinished = process.waitFor(180, TimeUnit.SECONDS); // 3 minute timeout
-            
+
             if (!processFinished) {
-                webSocketService.broadcastConsoleMessage(instance.getId(), 
+                webSocketService.broadcastConsoleMessage(instance.getId(),
                     ConsoleMessage.info("Server taking longer than expected, forcing shutdown..."));
                 process.destroyForcibly();
-                process.waitFor(10, TimeUnit.SECONDS); // Wait a bit for cleanup
+                if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                    log.warn("Forcibly destroyed process for instance {} did not terminate in time.", instance.getId());
+                }
+            } else {
+                int exitCode = process.exitValue();
+                if (exitCode != 0) {
+                    throw new RuntimeException("Server generation process failed with exit code: " + exitCode);
+                }
             }
             
             outputThread.join(5000);
