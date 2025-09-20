@@ -3,6 +3,7 @@
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 50ms ease-in-out, transform 50ms ease-in-out;
+    overflow-x: hidden;
 }
 
 .page-transition-wrapper.is-visible {

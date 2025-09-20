@@ -391,36 +391,3 @@ body {
     opacity: 0.6;
     pointer-events: none;
 }
-
-.notification-container {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1050;
-    width: 300px;
-}
-
-.notification {
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-    color: var(--text-primary);
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    opacity: 0.95;
-    transition: opacity 0.3s, transform 0.3s;
-}
-
-.notification.alert-success {
-    border-left: 4px solid var(--success);
-}
-
-.notification.alert-error {
-    border-left: 4px solid var(--danger);
-}
-
-.notification.removing {
-    opacity: 0;
-    transform: translateX(100%);
-}

@@ -14,7 +14,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +26,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 
 import static mc.server.service.LogPatterns.*;
@@ -49,7 +53,6 @@ public class MinecraftServerService {
     private final Map<Long, Integer> currentPlayerCounts = new ConcurrentHashMap<>();
 
 
-    @Cacheable("minecraftServerStatus")
     public ServerStatus getServerStatus(Long instanceId) {
         ServerInstance instance = getInstance(instanceId);
         try {
@@ -436,14 +439,15 @@ public class MinecraftServerService {
         return sendCommand(instanceId, "reload");
     }
 
-    @Async
     public CompletableFuture<Boolean> startServer(Long instanceId, Path javaExecutable, String memory) {
         ServerInstance instance = getInstance(instanceId);
         log.info("Starting Minecraft server instance {}...", instanceId);
-        return CompletableFuture.supplyAsync(() -> {
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        new Thread(() -> {
             try {
                 String javaCommand = (javaExecutable != null) ? javaExecutable.toString() : "java";
-
                 ProcessBuilder processBuilder = new ProcessBuilder(
                         javaCommand,
                         "-Xms" + memory,
@@ -452,7 +456,6 @@ public class MinecraftServerService {
                         instance.getJarFileName(),
                         "nogui"
                 );
-
                 processBuilder.directory(Paths.get(instance.getInstancePath()).toFile());
                 Process process = processBuilder.start();
                 instance.setPid((int) process.pid());
@@ -461,13 +464,30 @@ public class MinecraftServerService {
                 serverStartTimes.put(instanceId, LocalDateTime.now());
                 onlinePlayers.put(instanceId, ConcurrentHashMap.newKeySet());
                 currentPlayerCounts.put(instanceId, 0);
-                log.info("Minecraft server instance {} start command completed successfully", instanceId);
-                return true;
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        log.info("[Server {}] {}", instanceId, line);
+                        if (line.contains("Done")) {
+                            log.info("Minecraft server instance {} started successfully.", instanceId);
+                            future.complete(true);
+                            return;
+                        }
+                    }
+                }
+
+                int exitCode = process.waitFor();
+                log.error("Minecraft server instance {} failed to start. Exit code: {}", instanceId, exitCode);
+                future.complete(false);
+
             } catch (Exception e) {
                 log.error("Error starting Minecraft server instance {}", instanceId, e);
-                return false;
+                future.complete(false);
             }
-        });
+        }).start();
+
+        return future;
     }
 
     @Async
@@ -490,7 +510,19 @@ public class MinecraftServerService {
 
                 if (isServerRunning(instanceId)) {
                     log.warn("Server instance {} is still running, terminating process...", instanceId);
-                    ProcessHandle.of(instance.getPid()).ifPresent(ProcessHandle::destroy);
+                    ProcessHandle.of(instance.getPid()).ifPresent(processHandle -> {
+                        processHandle.destroyForcibly();
+                        try {
+                            processHandle.onExit().get(10, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            log.error("Interrupted while waiting for process termination", e);
+                        } catch (java.util.concurrent.TimeoutException e) {
+                            log.error("Process did not terminate in time: {}", e.getMessage());
+                        } catch (java.util.concurrent.ExecutionException e) {
+                            log.error("Error during process termination: {}", e.getMessage());
+                        }
+                    });
                 }
 
                 instance.setPid(null);
@@ -513,7 +545,7 @@ public class MinecraftServerService {
         log.info("Restarting Minecraft server instance {}...", instanceId);
 
         ServerInstance instance = getInstance(instanceId);
-        var template = templateService.getTemplateById(instance.getServerType());
+        var template = templateService.getTemplateById(instance.getTemplateId());
 
         return stopServer(instanceId).thenCompose(stopped -> {
             if (stopped) {
@@ -553,9 +585,31 @@ public class MinecraftServerService {
                 String backupFile = "world_backup_" + timestamp + ".tar.gz";
                 Path backupPath = backupDir.resolve(backupFile);
 
-                String command = String.format("tar -czf %s -C %s world world_nether world_the_end",
-                        backupPath, instance.getInstancePath());
-                Process process = new ProcessBuilder(command.split(" ")).start();
+                List<String> worldDirs = new ArrayList<>();
+                if (Files.exists(Paths.get(instance.getInstancePath(), "world"))) {
+                    worldDirs.add("world");
+                }
+                if (Files.exists(Paths.get(instance.getInstancePath(), "world_nether"))) {
+                    worldDirs.add("world_nether");
+                }
+                if (Files.exists(Paths.get(instance.getInstancePath(), "world_the_end"))) {
+                    worldDirs.add("world_the_end");
+                }
+
+                if (worldDirs.isEmpty()) {
+                    log.warn("No world directories found to back up for instance {}", instanceId);
+                    return false;
+                }
+
+                List<String> commandParts = new ArrayList<>();
+                commandParts.add("tar");
+                commandParts.add("-czf");
+                commandParts.add(backupPath.toString());
+                commandParts.add("-C");
+                commandParts.add(instance.getInstancePath());
+                commandParts.addAll(worldDirs);
+
+                Process process = new ProcessBuilder(commandParts).start();
                 int exitCode = process.waitFor();
 
                 boolean success = exitCode == 0;

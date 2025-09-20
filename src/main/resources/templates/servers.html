@@ -7,7 +7,7 @@
 <body>
 <div th:replace="~{fragments/_icon :: sprite}"></div>
 <div class="page-transition-wrapper">
-    <div class="notification-container" id="notification-container"></div>
+    <div th:replace="~{fragments/common :: notifications}"></div>
     <div th:replace="~{fragments/common :: main-navbar(breadcrumbs=${breadcrumbs})}"></div>
     <div class="main-container">
         <div class="page-header">

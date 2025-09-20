@@ -124,6 +124,7 @@ public class ServerController {
                         webSocketService.broadcastConsoleMessage(instanceId,
                                 ConsoleMessage.info("[SYSTEM] " + message)
                         );
+                        webSocketService.broadcastServerStatus(instanceId, minecraftServerService.getServerStatus(instanceId));
                         return ResponseEntity.ok(ApiResponse.success(message, "started"));
                     } else {
                         String error = "Failed to start server";
@@ -164,6 +165,7 @@ public class ServerController {
                         webSocketService.broadcastConsoleMessage(instanceId,
                                 ConsoleMessage.info("[SYSTEM] " + message)
                         );
+                        webSocketService.broadcastServerStatus(instanceId, minecraftServerService.getServerStatus(instanceId));
                         return ResponseEntity.ok(ApiResponse.success(message, "stopped"));
                     } else {
                         String error = "Failed to stop server";
