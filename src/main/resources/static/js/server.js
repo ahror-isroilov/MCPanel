@@ -2,8 +2,19 @@ let serverStatus = null;
 let instanceId = null;
 let serverProperties = {};
 let propertyValidations = {};
+let instance = null;
 
-
+async function loadInstanceData() {
+    try {
+        const response = await fetch(`/api/servers/${instanceId}`);
+        const result = await response.json();
+        if (result.success) {
+            instance = result.data;
+        }
+    } catch (error) {
+        console.error('Error loading instance data:', error);
+    }
+}
 
 function setButtonLoading(button, loading) {
     if (!button) return;
@@ -67,7 +78,13 @@ function updateServerStatusUI(status) {
     document.getElementById('server-version').textContent = status.version || 'N/A';
     document.getElementById('server-world').textContent = status.worldName || 'N/A';
     document.getElementById('cpu-usage').textContent = `${Math.round(status.cpuUsage || 0)}%`;
-    document.getElementById('ram-usage').textContent = status.online ? `${status.instanceRamUsage.toFixed(2)} MB / ${status.allocatedRam.toFixed(2)} MB` : 'Offline';
+    if (status.allocatedRam >= 1024) {
+        const instanceRamUsageGB = (status.instanceRamUsage / 1024).toFixed(2);
+        const allocatedRamGB = (status.allocatedRam / 1024).toFixed(2);
+        document.getElementById('ram-usage').textContent = status.online ? `${instanceRamUsageGB} GB / ${allocatedRamGB} GB` : 'Offline';
+    } else {
+        document.getElementById('ram-usage').textContent = status.online ? `${status.instanceRamUsage.toFixed(2)} MB / ${status.allocatedRam.toFixed(2)} MB` : 'Offline';
+    }
     document.getElementById('disk-usage').textContent = `${status.diskUsage.toFixed(2)} MB`;
     updatePlayerList(status.onlinePlayers || []);
 }
@@ -124,17 +141,37 @@ async function loadServerProperties() {
 }
 
 function renderPropertiesEditor() {
-    const editor = document.getElementById('properties-editor');
-    if (!editor) return;
+    const worldEditor = document.getElementById('world-properties-editor');
+    const serverEditor = document.getElementById('server-properties-editor');
+    if (!worldEditor || !serverEditor) return;
 
+    const worldKeys = ['level-name', 'level-seed', 'level-type', 'generator-settings', 'difficulty', 'gamemode', 'pvp', 'allow-flight', 'spawn-animals', 'spawn-monsters', 'spawn-npcs', 'view-distance', 'simulation-distance'];
+    
     const propertyKeys = Object.keys(propertyValidations);
     
     if (propertyKeys.length === 0) {
-        editor.innerHTML = '<div class="empty-state">No configurable properties found</div>';
+        worldEditor.innerHTML = '<div class="empty-state">No world properties found</div>';
+        serverEditor.innerHTML = '<div class="empty-state">No server properties found</div>';
         return;
     }
 
-    editor.innerHTML = propertyKeys.map(key => {
+    const worldPropertiesHtml = [];
+    const serverPropertiesHtml = [];
+
+    // Add memory allocation to server properties
+    const allocatedMemory = instance ? instance.allocatedMemory : '';
+    const allocatedMemoryInGb = allocatedMemory.toUpperCase().endsWith('G') ? allocatedMemory : (parseInt(allocatedMemory) / 1024).toFixed(2) + 'G';
+    serverPropertiesHtml.push(`
+        <div class="property-item-editor">
+            <div class="property-info">
+                <div class="property-name">allocated-memory</div>
+                <div class="property-description">Allocated Memory (e.g: 2G, 512M)</div>
+            </div>
+            <input type="text" id="allocated-memory" name="memory" value="${allocatedMemoryInGb}" class="property-input" data-property="allocated-memory">
+        </div>
+    `);
+
+    propertyKeys.forEach(key => {
         const validation = propertyValidations[key];
         const currentValue = serverProperties[key] || '';
         
@@ -182,11 +219,11 @@ function renderPropertiesEditor() {
             `;
         }
 
-        const requiresRestart = ['server-port', 'server-ip', 'online-mode', 'max-players', 
+        const requiresRestart = ['server-port', 'server-ip', 'online-mode',
                                 'enable-rcon', 'rcon.port', 'rcon.password',
                                 'level-name', 'level-seed', 'level-type', 'generator-settings'].includes(key);
 
-        return `
+        const propertyHtml = `
             <div class="property-item-editor">
                 <div class="property-info">
                     <div class="property-name">${key}</div>
@@ -196,34 +233,31 @@ function renderPropertiesEditor() {
                 ${inputHtml}
             </div>
         `;
-    }).join('');
+
+        if (worldKeys.includes(key)) {
+            worldPropertiesHtml.push(propertyHtml);
+        } else {
+            serverPropertiesHtml.push(propertyHtml);
+        }
+    });
+
+    worldEditor.innerHTML = worldPropertiesHtml.join('');
+    serverEditor.innerHTML = serverPropertiesHtml.join('');
 
     attachPropertyEventListeners();
 }
 
 function attachPropertyEventListeners() {
-    document.querySelectorAll('.property-input').forEach(input => {
-        input.addEventListener('blur', async (e) => {
-            await updateProperty(e.target.dataset.property, e.target.value);
-        });
-        input.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                await updateProperty(e.target.dataset.property, e.target.value);
-            }
-        });
-    });
-
-    document.querySelectorAll('.property-select-enhanced').forEach(select => {
-        select.addEventListener('change', async (e) => {
-            await updateProperty(e.target.dataset.property, e.target.value);
+    document.querySelectorAll('.property-input, .property-select-enhanced').forEach(input => {
+        input.addEventListener('change', (e) => {
+            e.target.classList.add('changed');
         });
     });
 
     document.querySelectorAll('.toggle-switch').forEach(toggle => {
-        toggle.addEventListener('click', async (e) => {
-            const isActive = toggle.classList.contains('active');
-            const newValue = isActive ? 'false' : 'true';
-            await updateProperty(toggle.dataset.property, newValue);
+        toggle.addEventListener('click', (e) => {
+            toggle.classList.toggle('active');
+            toggle.classList.add('changed');
         });
     });
 
@@ -233,45 +267,80 @@ function attachPropertyEventListeners() {
     }
 }
 
-async function updateProperty(propertyKey, value) {
-    try {
-        const response = await fetch(`/api/servers/${instanceId}/properties/${propertyKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `value=${encodeURIComponent(value)}`
-        });
+async function saveProperties(propertyType) {
+    const editor = document.getElementById(`${propertyType}-properties-editor`);
+    const changedInputs = editor.querySelectorAll('.changed');
+    const properties = {};
+    let memory = null;
 
-        const result = await response.json();
-        
-        if (result.success) {
-            serverProperties[propertyKey] = value;
-            
-            if (propertyValidations[propertyKey]?.type === 'boolean') {
-                const toggle = document.querySelector(`[data-property="${propertyKey}"]`);
-                if (toggle) {
-                    const isActive = value.toLowerCase() === 'true';
-                    toggle.classList.toggle('active', isActive);
-                }
-            }
-            
-            const message = result.data.requiresRestart ? 
-                `${propertyKey} updated (restart required)` : 
-                `${propertyKey} updated successfully`;
-            showNotification(message, 'success');
-            
-            if (propertyKey === 'white-list') {
-                renderPropertiesEditor();
-            }
+    changedInputs.forEach(input => {
+        const propertyKey = input.dataset.property;
+        let value;
+
+        if (input.classList.contains('toggle-switch')) {
+            value = input.classList.contains('active') ? 'true' : 'false';
         } else {
-            showNotification(`Failed to update ${propertyKey}: ${result.error}`, 'error');
-            loadServerProperties();
+            value = input.value;
         }
-    } catch (error) {
-        console.error('Error updating property:', error);
-        showNotification(`Error updating ${propertyKey}`, 'error');
+
+        if (propertyKey === 'allocated-memory') {
+            memory = value;
+        } else {
+            properties[propertyKey] = value;
+        }
+    });
+
+    const button = document.getElementById(`save-${propertyType}-properties`);
+    setButtonLoading(button, true);
+
+    try {
+        if (Object.keys(properties).length > 0) {
+            const response = await fetch(`/api/servers/${instanceId}/properties`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(properties)
+            });
+
+            const result = await response.json();
+            if (!result.success) {
+                showNotification(`Failed to update properties: ${result.error}`, 'error');
+                loadServerProperties(); // Reload to show original values
+                return;
+            }
+        }
+
+        if (memory) {
+            const memoryResponse = await fetch(`/api/servers/${instanceId}/memory`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `memory=${encodeURIComponent(memory)}`
+            });
+
+            const memoryResult = await memoryResponse.json();
+            if (!memoryResult.success) {
+                showNotification(`Failed to update memory: ${memoryResult.error}`, 'error');
+                loadServerProperties(); // Reload to show original values
+                return;
+            }
+            if (instance) {
+                instance.allocatedMemory = memory;
+            }
+        }
+
+        showNotification('Properties saved successfully.', 'success');
+        changedInputs.forEach(input => input.classList.remove('changed'));
         loadServerProperties();
+        loadServerStatus();
+
+    } catch (error) {
+        showNotification(`Error saving properties: ${error.message}`, 'error');
+        loadServerProperties();
+    } finally {
+        setButtonLoading(button, false);
     }
 }
 
@@ -407,34 +476,39 @@ async function removeFromWhitelist(playerName) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     instanceId = document.body.dataset.id;
     if (!instanceId) {
         console.error("Instance ID not found!");
         return;
     }
 
+    await loadInstanceData();
+    if (!instance) {
+        showNotification('Failed to load server data.', 'error');
+        return;
+    }
+
     const startBtn = document.getElementById('start-server-btn');
     const restartBtn = document.getElementById('restart-server-btn');
     const stopBtn = document.getElementById('stop-server-btn');
-    const refreshPropertiesBtn = document.getElementById('refresh-properties');
-    const refreshPlayersBtn = document.getElementById('refresh-players');
     const backupBtn = document.getElementById('backup-btn');
 
     startBtn.addEventListener('click', () => executeServerAction('start', startBtn));
     restartBtn.addEventListener('click', () => executeServerAction('restart', restartBtn));
     stopBtn.addEventListener('click', () => executeServerAction('stop', stopBtn));
-
-    if (refreshPropertiesBtn) {
-        refreshPropertiesBtn.addEventListener('click', loadServerProperties);
-    }
-
-    if (refreshPlayersBtn) {
-        refreshPlayersBtn.addEventListener('click', refreshPlayerList);
-    }
-
     if (backupBtn) {
         backupBtn.addEventListener('click', () => executeServerAction('backup', backupBtn));
+    }
+
+    const saveWorldPropsBtn = document.getElementById('save-world-properties');
+    if (saveWorldPropsBtn) {
+        saveWorldPropsBtn.addEventListener('click', () => saveProperties('world'));
+    }
+
+    const saveServerPropsBtn = document.getElementById('save-server-properties');
+    if (saveServerPropsBtn) {
+        saveServerPropsBtn.addEventListener('click', () => saveProperties('server'));
     }
 
     const closeWhitelistModalBtn = document.getElementById('close-whitelist-modal');

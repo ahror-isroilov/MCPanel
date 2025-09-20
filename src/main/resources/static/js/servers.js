@@ -98,7 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (ramUsageEl) {
-            ramUsageEl.textContent = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
+            if (server.allocatedRam >= 1024) {
+                const instanceRamUsageGB = (server.instanceRamUsage / 1024).toFixed(2);
+                const allocatedRamGB = (server.allocatedRam / 1024).toFixed(2);
+                ramUsageEl.textContent = server.online ? `${instanceRamUsageGB} GB / ${allocatedRamGB} GB` : 'Offline';
+            } else {
+                ramUsageEl.textContent = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
+            }
         }
 
         if (diskUsageEl) {
@@ -118,7 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const version = server.version || 'Unknown';
         const serverType = server.serverType || 'Paper';
 
-        const ramUsage = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
+        let ramUsage;
+        if (server.allocatedRam >= 1024) {
+            const instanceRamUsageGB = (server.instanceRamUsage / 1024).toFixed(2);
+            const allocatedRamGB = (server.allocatedRam / 1024).toFixed(2);
+            ramUsage = server.online ? `${instanceRamUsageGB} GB / ${allocatedRamGB} GB` : 'Offline';
+        } else {
+            ramUsage = server.online ? `${server.instanceRamUsage.toFixed(2)} MB / ${server.allocatedRam.toFixed(2)} MB` : 'Offline';
+        }
         const diskUsage = `${server.instanceDiskUsage.toFixed(2)} MB`;
 
         card.innerHTML = `

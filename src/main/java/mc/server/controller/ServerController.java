@@ -618,6 +618,19 @@ public class ServerController {
                 });
     }
 
+    @PostMapping("/memory")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<String>> updateMemory(@PathVariable Long instanceId, @RequestParam String memory) {
+        try {
+            minecraftServerService.updateAllocatedMemory(instanceId, memory);
+            return ResponseEntity.ok(ApiResponse.success("Memory updated successfully"));
+        } catch (Exception e) {
+            log.error("Error updating memory for instance {}", instanceId, e);
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.error("Failed to update memory"));
+        }
+    }
+
     @GetMapping("/console/history")
     public ResponseEntity<ApiResponse<java.util.List<ConsoleMessage>>> getConsoleHistory(@PathVariable Long instanceId) {
         try {
